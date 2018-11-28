@@ -1,0 +1,6 @@
+[submodule "qt_eagle_xml_parser"]
+	path = qt_eagle_xml_parser
+	url = https://github.com/martonmiklos/qt_eagle_xml_parser.git
+[submodule "qmainwindow_with_recent_list"]
+	path = qmainwindow_with_recent_list
+	url = git@bitbucket.org:digitroll/qmainwindow_with_recent_list.git
