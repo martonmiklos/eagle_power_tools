@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadRecentFiles(ui->menuRecent_designs);
     //connect(ui->ta)
+    Eagle design = Eagle::parseFile("/opt/eagle/lbr/test2.lbr", nullptr);
+    SilkscreenSlicer slicer = SilkscreenSlicer(&design);
+    slicer.checkSilkscreenWiresStopCollisions();
 }
 
 MainWindow::~MainWindow()

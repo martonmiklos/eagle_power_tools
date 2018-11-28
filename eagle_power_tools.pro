@@ -8,7 +8,7 @@ QT       += core gui
 
 QT += widgets
 
-TARGET = eagle_attribute_manager
+TARGET = eagle_power_tools
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
