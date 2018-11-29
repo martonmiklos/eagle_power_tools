@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     Eagle design = Eagle::parseFile("/opt/eagle/lbr/test2.lbr", nullptr);
     SilkscreenSlicer slicer = SilkscreenSlicer(&design);
     slicer.checkSilkscreenWiresStopCollisions();
+
+    m_settingsDialog = new DialogSettings(this);
 }
 
 MainWindow::~MainWindow()
@@ -54,4 +56,9 @@ void MainWindow::on_actionSilkscreen_slicer_triggered()
             m_settings.setValue("lastSlicedLbr", lastSlicedLbr);
         }
     }
+}
+
+void MainWindow::on_actionSettings_triggered()
+{
+    m_settingsDialog->show();
 }

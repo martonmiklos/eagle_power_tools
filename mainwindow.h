@@ -3,6 +3,8 @@
 
 #include "qmainwindow_with_recent_list/mainwindowwithrecentlist.h"
 
+#include "dialogsettings.h"
+
 #include <QMainWindow>
 #include <QSettings>
 
@@ -24,9 +26,12 @@ private slots:
 
     bool openFile(const QString & fileName) override;
 
+    void on_actionSettings_triggered();
+
 private:
     Ui::MainWindow *ui;
     QSettings m_settings;
+    DialogSettings *m_settingsDialog;
 };
 
 #endif // MAINWINDOW_H
