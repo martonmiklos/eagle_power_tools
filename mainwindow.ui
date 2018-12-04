@@ -54,6 +54,7 @@
       <string>Library tools</string>
      </property>
      <addaction name="actionSilkscreen_slicer"/>
+     <addaction name="actionLibrary_QA"/>
     </widget>
     <addaction name="menuLibrary"/>
    </widget>
@@ -84,6 +85,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionLibrary_QA">
+   <property name="text">
+    <string>Library QA</string>
    </property>
   </action>
  </widget>

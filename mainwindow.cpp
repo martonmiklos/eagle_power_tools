@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QFileDialog>
-
+#include "graphicsutilities.h"
 #include "silkscreenslicer.h"
+#include "qt_eagle_xml_parser/utils.h"
+
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     MainWindowWithRecentList(parent),
@@ -23,6 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    MainWindowWithRecentList::closeEvent(event);
+    QCoreApplication::exit();
 }
 
 bool MainWindow::openFile(const QString &fileName)
@@ -61,4 +69,9 @@ void MainWindow::on_actionSilkscreen_slicer_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     m_settingsDialog->show();
+}
+
+void MainWindow::on_actionLibrary_QA_triggered()
+{
+
 }

@@ -44,7 +44,10 @@ SOURCES += \
     graphicsutilities.cpp \
     dialogsettings.cpp \
     eaglerc/palette.cpp \
-    eaglerc/eaglesettings.cpp
+    eaglerc/eaglesettings.cpp \
+    dialoggraphicsdebug.cpp \
+    library_qa/libraryqa_step.cpp \
+    library_qa/checknamesandvalues.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -56,8 +59,12 @@ HEADERS += \
     graphicsutilities.h \
     dialogsettings.h \
     eaglerc/palette.h \
-    eaglerc/eaglesettings.h
+    eaglerc/eaglesettings.h \
+    dialoggraphicsdebug.h \
+    library_qa/libraryqa_step.h \
+    library_qa/checknamesandvalues.h
 
 FORMS += \
         mainwindow.ui \
-    dialogsettings.ui
+    dialogsettings.ui \
+    dialoggraphicsdebug.ui

@@ -5,6 +5,7 @@
 
 #include "dialogsettings.h"
 
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QSettings>
 
@@ -19,6 +20,7 @@ class MainWindow : public MainWindowWithRecentList
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_actionLoad_EAGLE_design_triggered();
@@ -27,6 +29,8 @@ private slots:
     bool openFile(const QString & fileName) override;
 
     void on_actionSettings_triggered();
+
+    void on_actionLibrary_QA_triggered();
 
 private:
     Ui::MainWindow *ui;
