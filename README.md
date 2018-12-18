@@ -12,5 +12,7 @@ Planned features:
  * Quality assurance for libraries
    * Check for parts without name prefix (U$*)
    * Check for power/passive pins suffixed with _1, _2 and offer change to @1, @2... suffix
+   * Check whether all symbols and footprints have >NAME and >VALUE texts on the respective layers
+   * Check for '*' texts used for pin 1 marking and replace them with a circle
  * Importing Kicad libraries
  * Sync BoMs to Arena PLM
