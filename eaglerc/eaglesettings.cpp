@@ -12,10 +12,10 @@ bool EAGLESettings::load(const QString &path)
 {
     QSettings eagleRC(path, QSettings::IniFormat);
     int paletteIndex = 0;
-    int schPaletteIndex = eagleRC.value("Sch.Palette", "0").toInt();
+    int schPaletteIndex = eagleRC.value("Sch.Palette", "1").toInt();
     int brdPaletteIndex = eagleRC.value("Brd.Palette", "0").toInt();
 
-    while (1) {
+    while (true) {
         if (eagleRC.value(QString("Palette.%1.0").arg(paletteIndex), "").toString().isEmpty())
             break;
 

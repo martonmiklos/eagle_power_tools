@@ -8,7 +8,7 @@
 class CheckNamesAndValues : public LibraryQA_Step
 {
 public:
-    Severity check(const Library & library);
+    Severity check(Library *library);
 
 private:
     bool m_checkNames, m_checkValues;

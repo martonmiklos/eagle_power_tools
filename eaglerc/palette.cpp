@@ -4,8 +4,10 @@
 void Palette::parse(const QSettings *settings)
 {
     int layerIndex = 0;
-    while (1) {
-        QString colorString = settings->value(QString("Palette.%1.%2").arg(m_paletteIndex).arg(layerIndex), "").toString();
+    while (true) {
+        QString colorString = settings->value(QString("Palette.%1.%2")
+                                              .arg(m_paletteIndex)
+                                              .arg(layerIndex), "").toString();
         if (colorString.length() == 10) {
             QColor color;
             color.setNamedColor("#" + colorString.mid(2, colorString.length() - 2));

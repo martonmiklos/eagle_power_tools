@@ -42,7 +42,7 @@ bool GraphicsUtilities::lineIntersectsCurve(const QLineF &line,
     /*verify the roots are in bounds of the linear segment*/
     int i = 0;
     if (intersectionCnt)
-        intersectionCnt = 0;
+        *intersectionCnt = 0;
     for (qreal t : cubicRoots(P[0], P[1], P[2], P[3])) {
         if (0.0 < t && t < 1.0) {
             qreal x = bx[0]*t*t*t+bx[1]*t*t+bx[2]*t+bx[3];
@@ -83,7 +83,7 @@ bool GraphicsUtilities::lineIntersectsCurve(const QLineF &line,
                     return true;
                 }
                 if (intersectionCnt)
-                    intersectionCnt++;
+                    *intersectionCnt = (*intersectionCnt + 1);
                 ret = true;
             }
         }

@@ -47,7 +47,11 @@ SOURCES += \
     eaglerc/eaglesettings.cpp \
     dialoggraphicsdebug.cpp \
     library_qa/libraryqa_step.cpp \
-    library_qa/checknamesandvalues.cpp
+    library_qa/checknamesandvalues.cpp \
+    gerberimportfixer.cpp \
+    mpc/mpc.c \
+    kicad/kicadlegacyfootprintimport.cpp \
+    kicad/kicadimportutils.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -62,7 +66,11 @@ HEADERS += \
     eaglerc/eaglesettings.h \
     dialoggraphicsdebug.h \
     library_qa/libraryqa_step.h \
-    library_qa/checknamesandvalues.h
+    library_qa/checknamesandvalues.h \
+    gerberimportfixer.h \
+    mpc/mpc.h \
+    kicad/kicadlegacyfootprintimport.h \
+    kicad/kicadimportutils.h
 
 FORMS += \
         mainwindow.ui \

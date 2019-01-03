@@ -4,3 +4,6 @@
 [submodule "qmainwindow_with_recent_list"]
 	path = qmainwindow_with_recent_list
 	url = git@bitbucket.org:digitroll/qmainwindow_with_recent_list.git
+[submodule "mpc"]
+	path = mpc
+	url = https://github.com/orangeduck/mpc.git

@@ -55,8 +55,10 @@
      </property>
      <addaction name="actionSilkscreen_slicer"/>
      <addaction name="actionLibrary_QA"/>
+     <addaction name="actionConvert_Kicad_library"/>
     </widget>
     <addaction name="menuLibrary"/>
+    <addaction name="actionGerber_import_fix"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -90,6 +92,16 @@
   <action name="actionLibrary_QA">
    <property name="text">
     <string>Library QA</string>
+   </property>
+  </action>
+  <action name="actionGerber_import_fix">
+   <property name="text">
+    <string>Gerber import fix</string>
+   </property>
+  </action>
+  <action name="actionConvert_Kicad_library">
+   <property name="text">
+    <string>Convert Kicad library</string>
    </property>
   </action>
  </widget>

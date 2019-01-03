@@ -19,7 +19,7 @@ public:
 
 private:
     Ui::DialogGraphicsDebug *ui;
-    QPainter *m_painter;
+    QPainter *m_painter = nullptr;
 };
 
 #endif // DIALOGGRAPHICSDEBUG_H
