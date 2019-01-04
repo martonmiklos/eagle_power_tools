@@ -3,11 +3,16 @@
 
 #include <QString>
 
+// TODO get rid of these functions
+const char *emsg(void);
+char *slurp(FILE *f);
+
 class KicadUnitConverter
 {
 public:
     enum Mode {
         DeciMil,
+        Mil,
         Mm
     };
     KicadUnitConverter(Mode = DeciMil);

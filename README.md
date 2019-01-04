@@ -10,6 +10,7 @@ WIP (work in progress) features:
  * Cleanup after importing gerber files:
    * Connecting the overlapping wire segments to a single net
    * Autplacing vias where acceptible
+ * Converting Kicad libraries
  
 Planned features:
  * Quality assurance for libraries
@@ -18,7 +19,6 @@ Planned features:
    * Check whether all symbols and footprints have >NAME and >VALUE texts on the respective layers
    * Check for '*' texts used for pin 1 marking and replace them with a circle
    * Add feature to perform library QA on design projects: the same checks shall be perfomed on all parts used by a design, with ability to do fixes in the design and the referenced libraries as well
- * Importing Kicad libraries
  * Sync BoMs to Arena PLM
  * Generate markdown pages from libraries with symbol/footprint images
  * Connector series generator: draw a connector with least 3 pins, select the pin 1, the middle and the end section and the tool will generate the more pin variants.

@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadRecentFiles(ui->menuRecent_designs);
 
     KicadLegacyFootprintLibImporter importer;
-    importer.parseLibrary("/tmp/AA01B-S040VA1.mod");
+    importer.parseModFile("/tmp/AA01B-S040VA1.mod");
 
     m_dru = new DRULoader("/opt/eagle/dru/default_test.dru");
 
@@ -113,7 +113,7 @@ void MainWindow::on_actionConvert_Kicad_library_triggered()
                                                          tr("Kicad library files (*.mod)"));
     if (!lastKicadLibFile.isEmpty()) {
         KicadLegacyFootprintLibImporter importer;
-        importer.parseLibrary("/tmp/AA01B-S040VA1.mod");
+        importer.parseModFile("/tmp/AA01B-S040VA1.mod");
         m_settings.setValue("lastKicadLibFile", lastKicadLibFile);
     }
 }

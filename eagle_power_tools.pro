@@ -51,7 +51,8 @@ SOURCES += \
     gerberimportfixer.cpp \
     mpc/mpc.c \
     kicad/kicadlegacyfootprintimport.cpp \
-    kicad/kicadimportutils.cpp
+    kicad/kicadimportutils.cpp \
+    kicad/kicadlegacysymbolfileimport.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -70,7 +71,9 @@ HEADERS += \
     gerberimportfixer.h \
     mpc/mpc.h \
     kicad/kicadlegacyfootprintimport.h \
-    kicad/kicadimportutils.h
+    kicad/kicadimportutils.h \
+    kicad/kicadlegacysymbolfileimport.h \
+    kicad/legacy_symbollib_grammar.h
 
 FORMS += \
         mainwindow.ui \
