@@ -349,6 +349,34 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
         }
     }
 
+    mpc_ast_t *pin_type_ast = mpc_ast_get_child_lb(pin_ast, "pin_type|char", 0);
+    if (pin_type_ast) {
+        QString pinType(pin_type_ast->contents);
+        if (pinType == "w") {
+            // power output
+            pin->setDirection(Pin::Direction_pwr);
+        } else if (pinType == "w") {
+            // power input
+            pin->setDirection(Pin::Direction_sup);
+        } else if (pinType == "I") {
+            pin->setDirection(Pin::Direction_in);
+        } else if (pinType == "O") {
+            pin->setDirection(Pin::Direction_out);
+        } else if (pinType == "B") {
+            pin->setDirection(Pin::Direction_io);
+        } else if (pinType == "C") {
+            pin->setDirection(Pin::Direction_oc);
+        } else if (pinType == "N") {
+            pin->setDirection(Pin::Direction_nc);
+        } else {
+            pin->setDirection(Pin::Direction_pas);
+        }
+
+        // quickmess GND always pas
+        if (pin->name() == "GND")
+            pin->setDirection(Pin::Direction_pas);
+    }
+
     if (symbol->pinNamesVisible() && symbol->pinNumbersVisible())
         pin->setVisible(Pin::Visible_both);
     else if (!symbol->pinNamesVisible() && symbol->pinNumbersVisible())

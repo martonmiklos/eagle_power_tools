@@ -87,8 +87,8 @@
   X(pin_orientation, "pin_orientation")\
   X(pin_num_size, "pin_num_size")\
   X(pin_name_size, "pin_name_size")\
-  X(pin_shape, "pin_shape")\
   X(pin_type, "pin_type")\
+  X(pin_shape, "pin_shape")\
   X(comment, "comment")\
   X(symbol_lib, "symbol_lib")
 #endif
