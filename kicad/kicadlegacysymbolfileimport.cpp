@@ -36,19 +36,19 @@ bool KicadLegacySymbolFileImport::parseSymbolLibFile(const QString &libraryPath,
         return false;
     }
 
+    Symbols *symbols = new Symbols();
+    m_library->setSymbols(symbols);
     ast = parseSymbolLibFileToAst(libraryPath.toLocal8Bit().constData(), istring);
-
     for(int i = 0; i >= 0;) {
         i = mpc_ast_get_index_lb(ast, "symbol|>", i);
         if (i >= 0) {
             mpc_ast_t *symbol_ast = mpc_ast_get_child_lb(ast, "symbol|>", i);
-            parseSymbolAstToLibrary(symbol_ast, m_library);
+            parseSymbolAstToLibrary(symbol_ast);
             i++;
         }
     }
     return true;
 }
-
 
 mpc_ast_t *KicadLegacySymbolFileImport::parseSymbolLibFileToAst(const char *file_name, const char *data)
 {
@@ -88,10 +88,57 @@ mpc_ast_t *KicadLegacySymbolFileImport::parseSymbolLibFileToAst(const char *file
     return ast;
 }
 
-void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast, Library *library)
+void KicadLegacySymbolFileImport::parseTextAstAttributes(mpc_ast_t *text_ast, Text *text)
 {
-    Symbol *symbol = new Symbol();
-    QString footprintName;
+    mpc_ast_t *x_ast = mpc_ast_get_child_lb(text_ast, "x|>", 0);
+    mpc_ast_t *y_ast = mpc_ast_get_child_lb(text_ast, "y|>", 0);
+
+    text->setX(m_unitConverter.convert(x_ast->children[0]->contents));
+    text->setY(m_unitConverter.convert(y_ast->children[0]->contents));
+
+    mpc_ast_t *size_ast = mpc_ast_get_child_lb(text_ast, "size|>", 0);
+    text->setSize(m_unitConverter.convert(size_ast->children[0]->contents));
+
+    mpc_ast_t *orientation = mpc_ast_get_child_lb(text_ast, "orientation|>", 0);
+    if (QString(orientation->children[0]->contents) == "V")
+        text->setRot("R270");
+
+    mpc_ast_t *halign = mpc_ast_get_child_lb(text_ast, "halign|>", 0);
+    mpc_ast_t *valign = mpc_ast_get_child_lb(text_ast, "valign|char", 0);
+
+    QString halignStr = QString(halign->children[0]->contents);
+    QString valignStr = QString(valign->contents);
+    if (valignStr == "T") {
+        if (halignStr == "L") {
+            text->setAlign(Text::Align_top_left);
+        } else if (halignStr == "C") {
+            text->setAlign(Text::Align_top_center);
+        } else if (halignStr == "R") {
+            text->setAlign(Text::Align_top_right);
+        }
+    } else if (valignStr == "C") {
+        if (halignStr == "L") {
+            text->setAlign(Text::Align_center_left);
+        } else if (halignStr == "C") {
+            text->setAlign(Text::Align_center);
+        } else if (halignStr == "R") {
+            text->setAlign(Text::Align_center_right);
+        }
+    } else if (valignStr == "B") {
+        if (halignStr == "L") {
+            text->setAlign(Text::Align_bottom_left);
+        } else if (halignStr == "C") {
+            text->setAlign(Text::Align_bottom_center);
+        } else if (halignStr == "R") {
+            text->setAlign(Text::Align_bottom_right);
+        }
+    }
+}
+
+void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast)
+{
+    KicadImportSymbol *symbol = new KicadImportSymbol();
+    QString footprintName, refdesPrefix, deviceName;
 
     mpc_ast_t *symboldef_ast = mpc_ast_get_child_lb(symbol_ast, "symboldef|>", 0);
     if (symboldef_ast) {
@@ -99,24 +146,91 @@ void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast,
         if (name_ast) {
             symbol->setName(name_ast->children[0]->contents);
         }
+
+        mpc_ast_t *show_pin_names = mpc_ast_get_child_lb(symboldef_ast, "show_pin_names|>", 0);
+        if (show_pin_names) {
+            symbol->setPinNamesVisible(QString(show_pin_names->children[0]->contents) == "Y");
+        }
+
+        mpc_ast_t *show_pin_numbers = mpc_ast_get_child_lb(symboldef_ast, "show_pin_numbers|>", 0);
+        if (show_pin_numbers) {
+            symbol->setPinNumbersVisible(QString(show_pin_numbers->children[0]->contents) == "Y");
+        }
     }
+
+    mpc_ast_t *refdes_text_ast = mpc_ast_get_child_lb(symbol_ast, "refdes_text|>", 0);
+    if (refdes_text_ast) {
+        Text *text = new Text();
+        text->setLayer(95); // FIXME hardcoded NAMES layer
+        text->setValue(">NAME");
+        parseTextAstAttributes(refdes_text_ast, text);
+        symbol->addText(text);
+
+        refdesPrefix = QString(refdes_text_ast->children[1]->children[1]->contents);
+    }
+
+    mpc_ast_t *name_text = mpc_ast_get_child_lb(symbol_ast, "name_text|>", 0);
+    if (name_text) {
+        Text *text = new Text();
+        text->setLayer(96); // FIXME hardcoded VALUES layer
+        text->setValue(">VALUE");
+        parseTextAstAttributes(name_text, text);
+
+        symbol->addText(text);
+
+        deviceName = QString(name_text->children[1]->children[1]->contents);
+    }
+
+    Devicesets *dss = new Devicesets();
+    Connects *connects = nullptr;
+    mpc_ast_t *footprint_text = mpc_ast_get_child_lb(symbol_ast, "footprint_text|>", 0);
+    if (footprint_text) {
+        mpc_ast_t *footprint_name_ast = mpc_ast_get_child_lb(footprint_text, "string|>", 0);
+        if (footprint_name_ast) {
+            QString footprintName(footprint_name_ast->children[1]->contents);
+            for (Package *pkg : *m_library->packages()->packageList()) {
+                if (pkg->name() == footprintName) {
+                    Deviceset *ds = new Deviceset();
+                    ds->setPrefix(refdesPrefix);
+                    ds->setName(deviceName);
+
+                    Gate *gate = new Gate();
+                    gate->setSymbol(symbol->name());
+                    gate->setName("G$1");
+
+                    Gates *gates = new Gates();
+                    gates->addGate(gate);
+                    ds->setGates(gates);
+
+                    Device *dev = new Device();
+                    dev->setPackage(footprintName);
+
+                    connects = new Connects();
+                    dev->setConnects(connects);
+
+                    Devices *devs = new Devices();
+                    ds->setDevices(devs);
+                    ds->devices()->addDevice(dev);
+                    dss->addDeviceset(ds);
+                    break;
+                }
+            }
+        }
+    }
+    m_library->setDevicesets(dss);
 
     mpc_ast_t *drawing_ast = mpc_ast_get_child_lb(symbol_ast, "drawing|>", 0);
     if (drawing_ast) {
-        parseDrawingAstToSymbol(drawing_ast, symbol);
+        parseDrawingAstToSymbol(drawing_ast, symbol, connects);
     }
 
-
-    // TODO generate deviceset
-    mpc_ast_t *footprint_text_ast = mpc_ast_get_child_lb(symbol_ast, "footprint_text|>", 0);
-    if (footprint_text_ast && footprint_text_ast->children_num > 2) {
-        footprintName = footprint_text_ast->children[1]->contents;
-    }
 
     m_library->symbols()->addSymbol(symbol);
 }
 
-void KicadLegacySymbolFileImport::parseDrawingAstToSymbol(mpc_ast_t *drawing_ast, Symbol *symbol)
+void KicadLegacySymbolFileImport::parseDrawingAstToSymbol(mpc_ast_t *drawing_ast,
+                                                          KicadImportSymbol *symbol,
+                                                          Connects *connects)
 {
     m_pinCountMap.clear();
     for(int i = 0; i >= 0;) {
@@ -132,13 +246,13 @@ void KicadLegacySymbolFileImport::parseDrawingAstToSymbol(mpc_ast_t *drawing_ast
         i = mpc_ast_get_index_lb(drawing_ast, "pin|>", i);
         if (i >= 0) {
             mpc_ast_t *pin_ast = mpc_ast_get_child_lb(drawing_ast, "pin|>", i);
-            pinAstToSymbol(pin_ast, symbol);
+            pinAstToSymbol(pin_ast, symbol, connects);
             i++;
         }
     }
 }
 
-void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast, Symbol *symbol)
+void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast, KicadImportSymbol *symbol)
 {
 
     mpc_ast_t *x1_ast = mpc_ast_get_child_lb(rectangle_ast, "x1|>", 0);
@@ -208,7 +322,9 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
     }
 }
 
-void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast, Symbol *symbol)
+void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
+                                                 KicadImportSymbol *symbol,
+                                                 Connects *connects)
 {
     Pin *pin = new Pin();
     mpc_ast_t *name_ast = mpc_ast_get_child_lb(pin_ast, "nonquoted_name_string|regex", 0);
@@ -233,6 +349,15 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast, Symbol *sym
         }
     }
 
+    if (symbol->pinNamesVisible() && symbol->pinNumbersVisible())
+        pin->setVisible(Pin::Visible_both);
+    else if (!symbol->pinNamesVisible() && symbol->pinNumbersVisible())
+        pin->setVisible(Pin::Visible_pad);
+    else if (symbol->pinNamesVisible() && !symbol->pinNumbersVisible())
+        pin->setVisible(Pin::Visible_pin);
+    else if (!symbol->pinNamesVisible() && !symbol->pinNumbersVisible())
+        pin->setVisible(Pin::Visible_off);
+
     if (m_pinCountMap.contains(pin->name())) {
         QString baseName = pin->name();
         pin->setName(QString("%1@%2").arg(baseName).arg(m_pinCountMap[baseName]));
@@ -241,6 +366,14 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast, Symbol *sym
         for (Pin *existingPin : *symbol->pinList()) {
             if (existingPin->name() == pin->name()) {
                 existingPin->setName(existingPin->name() + "@1");
+
+                foreach (Connect *conn, *connects->connectList()) {
+                    if (conn->pin() == pin->name()) {
+                        conn->setPin(existingPin->name());
+                        break;
+                    }
+                }
+
                 m_pinCountMap[pin->name()] = 3;
                 pin->setName(pin->name() + "@2");
                 break;
@@ -248,5 +381,39 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast, Symbol *sym
         }
     }
 
+    if (connects) {
+        Connect *conn = new Connect();
+        conn->setGate("G$1"); // FIXME
+        mpc_ast_t *pin_number = mpc_ast_get_child_lb(pin_ast, "pin_number|>", 0);
+        if (pin_number) {
+            QString pinNumberStr(pin_number->children[0]->contents);
+            if (pinNumberStr != "~") {
+                conn->setPad(pinNumberStr);
+                conn->setPin(pin->name());
+                connects->addConnect(conn);
+            }
+        }
+    }
+
     symbol->addPin(pin);
+}
+
+bool KicadImportSymbol::pinNumbersVisible() const
+{
+    return m_pinNumbersVisible;
+}
+
+void KicadImportSymbol::setPinNumbersVisible(bool pinNumbersVisible)
+{
+    m_pinNumbersVisible = pinNumbersVisible;
+}
+
+bool KicadImportSymbol::pinNamesVisible() const
+{
+    return m_pinNamesVisible;
+}
+
+void KicadImportSymbol::setPinNamesVisible(bool pinNamesVisible)
+{
+    m_pinNamesVisible = pinNamesVisible;
 }

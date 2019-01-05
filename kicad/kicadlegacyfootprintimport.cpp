@@ -187,8 +187,7 @@ static const char *modfile_grammar =
         " modulepos            : \"Po\" <s> <x> <y> <angle> <layer> <tedit> <tstamp> <modattrs> <n>; \n"
         " endlibrary           : \"$EndLIBRARY\" <n>* ; \n"
         " units                : \"Units\" <s> \"mm\" <n> ; \n"
-        " modules              : <module>* ; \n"
-        " library              : <header> <encoding> <units>? <symbolnames> <modules> <endlibrary>; \n" ;
+        " library              : <header> <encoding> <units>? <symbolnames> <module>* <endlibrary>; \n" ;
 
 KicadLegacyFootprintLibImporter::KicadLegacyFootprintLibImporter()
 {
@@ -263,7 +262,7 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
     }
 
     // FIXME remove this and let the symbol importer handle it
-    Symbols *symbols = new Symbols();
+    /*Symbols *symbols = new Symbols();
     mpc_ast_t *symbols_ast = mpc_ast_get_child_lb(ast, "symbolnames|>", 0);
     if (symbols_ast) {
         for(int i = 0; i >= 0;) {
@@ -283,31 +282,28 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
             }
         }
     }
-    lib->setSymbols(symbols);
+    lib->setSymbols(symbols);*/
 
     Packages *packages = new Packages();
-    mpc_ast_t *modules_ast = mpc_ast_get_child_lb(ast, "modules|>", 0);
-    if (modules_ast) {
-        for(int i = 0; i >= 0;) {
-            i = mpc_ast_get_index_lb(modules_ast, "module|>", i);
-            if (i >= 0) {
-                mpc_ast_t *module_ast = mpc_ast_get_child_lb(modules_ast, "module|>", i);
-                if (module_ast) {
-                    mpc_ast_t *modulename_ast = mpc_ast_get_child_lb(module_ast, "symbolname|>", 0);
-                    if (modulename_ast) {
-                        mpc_ast_t *symbolname_ast = mpc_ast_get_child_lb(modulename_ast, "nonquoted_string|regex", 0);
-                        if (symbolname_ast) {
-                            qWarning() << symbolname_ast->contents;
+    for(int i = 0; i >= 0;) {
+        i = mpc_ast_get_index_lb(ast, "module|>", i);
+        if (i >= 0) {
+            mpc_ast_t *module_ast = mpc_ast_get_child_lb(ast, "module|>", i);
+            if (module_ast) {
+                mpc_ast_t *modulename_ast = mpc_ast_get_child_lb(module_ast, "symbolname|>", 0);
+                if (modulename_ast) {
+                    mpc_ast_t *symbolname_ast = mpc_ast_get_child_lb(modulename_ast, "nonquoted_string|regex", 0);
+                    if (symbolname_ast) {
+                        qWarning() << symbolname_ast->contents;
 
-                            Package *package = parseModuleAstToPackage(module_ast, symbolname_ast->contents);
-                            if (package) {
-                                packages->addPackage(package);
-                            }
+                        Package *package = parseModuleAstToPackage(module_ast, symbolname_ast->contents);
+                        if (package) {
+                            packages->addPackage(package);
                         }
                     }
                 }
-                i++;
             }
+            i++;
         }
     }
     lib->setPackages(packages);
