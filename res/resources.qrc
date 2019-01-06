@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>blank_lib.lbr</file>
+    </qresource>
+</RCC>

@@ -29,6 +29,9 @@ public:
     KicadLegacySymbolFileImport();
 
     bool parseSymbolLibFile(const QString & libraryPath, Library *lib);
+    Library *library() const;
+    void setLibrary(Library *library);
+
 private:
     mpc_ast_t *parseSymbolLibFileToAst(const char *file_name, const char *string);
     KicadUnitConverter m_unitConverter;

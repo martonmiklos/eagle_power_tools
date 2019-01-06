@@ -15,8 +15,9 @@ TEMPLATE = app
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS SEXPRESSO_OPT_OUT_PIKESTYLE
 
+CONFIG += c++11
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -52,7 +53,10 @@ SOURCES += \
     mpc/mpc.c \
     kicad/kicadlegacyfootprintimport.cpp \
     kicad/kicadimportutils.cpp \
-    kicad/kicadlegacysymbolfileimport.cpp
+    kicad/kicadlegacysymbolfileimport.cpp \
+    kicad/kicadfootprintimport.cpp \
+    sexpresso/sexpresso/sexpresso.cpp \
+    eagle_librarysaver.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -73,9 +77,15 @@ HEADERS += \
     kicad/kicadlegacyfootprintimport.h \
     kicad/kicadimportutils.h \
     kicad/kicadlegacysymbolfileimport.h \
-    kicad/legacy_symbollib_grammar.h
+    kicad/legacy_symbollib_grammar.h \
+    kicad/kicadfootprintimport.h \
+    sexpresso/sexpresso/sexpresso.hpp \
+    eagle_librarysaver.h
 
 FORMS += \
         mainwindow.ui \
     dialogsettings.ui \
     dialoggraphicsdebug.ui
+
+RESOURCES += \
+    res/resources.qrc

@@ -1,6 +1,7 @@
 #ifndef KICADIMPORTUTILS_H
 #define KICADIMPORTUTILS_H
 
+#include <QMap>
 #include <QString>
 
 // TODO get rid of these functions
@@ -31,14 +32,16 @@ class KicadLayerToEAGLEMapper
 {
 public:
     static int mapKicadLayerToEagle(int kicadLayer, bool *ok = nullptr);
+    static int mapKicadStringLayerToEagle(const QString & kicadLayer, bool *ok = nullptr);
 
+    // see: https://github.com/KiCad/kicad-source-mirror/blob/master/pcbnew/legacy_plugin.cpp#L102
     enum KicadLayer {
         BAdhes = 16,
         FAdhes = 17,
         BPaste = 18,
         FPaste = 19,
-        BSilk = 20,
-        FSlik = 21,
+        BSilkS = 20,
+        FSilkS = 21,
         BMask = 22,
         FMask = 23,
         DwgsUser = 24,
@@ -46,8 +49,10 @@ public:
         Eco1User = 26,
         Eco2User = 27,
         EdgeCuts = 28
-        // TODO extend it
     };
+
+    static QMap<KicadLayer, int> kicadToEagleLayerMap;
+    static QMap<QString, int> kicadStringToEagleLayerMap;
 };
 
 #endif // KICADIMPORTUTILS_H

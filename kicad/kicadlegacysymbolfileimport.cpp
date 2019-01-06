@@ -372,7 +372,7 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
             pin->setDirection(Pin::Direction_pas);
         }
 
-        // quickmess GND always pas
+        // quickmess GND always pas FIXME remove once lib QA competed
         if (pin->name() == "GND")
             pin->setDirection(Pin::Direction_pas);
     }
@@ -424,6 +424,16 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
     }
 
     symbol->addPin(pin);
+}
+
+Library *KicadLegacySymbolFileImport::library() const
+{
+    return m_library;
+}
+
+void KicadLegacySymbolFileImport::setLibrary(Library *library)
+{
+    m_library = library;
 }
 
 bool KicadImportSymbol::pinNumbersVisible() const

@@ -192,6 +192,8 @@ static const char *modfile_grammar =
 KicadLegacyFootprintLibImporter::KicadLegacyFootprintLibImporter()
 {
     m_eagle = new Eagle();
+    m_drawing = new Drawing();
+    m_eagle->setDrawing(m_drawing);
 }
 
 mpc_ast_t *KicadLegacyFootprintLibImporter::parseModfileToAst(const char *file_name, const char *string)
@@ -240,8 +242,6 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
     mpc_ast_t *ast = nullptr;
     FILE *handle = fopen(libraryPath.toLocal8Bit().constData(), "rb");
     char *istring = nullptr;
-    Drawing *drawing = new Drawing();
-    m_eagle->setDrawing(drawing);
 
     Library *lib = new Library();
 
@@ -307,7 +307,7 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
         }
     }
     lib->setPackages(packages);
-    drawing->setLibrary(lib);
+    m_drawing->setLibrary(lib);
 
     free(istring);
     return lib;

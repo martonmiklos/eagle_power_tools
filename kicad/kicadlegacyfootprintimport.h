@@ -30,7 +30,10 @@ private:
     void parsePadsAstToPackage(mpc_ast_t *lines_ast, Package *package);
 
     QString m_libPath;
+
+    // FIXME get rid of them and use EAGLE_LibrarySaver
     Eagle *m_eagle;
+    Drawing *m_drawing;
 };
 
 #endif // KICADLIBIMPORTER_H

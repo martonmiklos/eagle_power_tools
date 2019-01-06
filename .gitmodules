@@ -7,3 +7,6 @@
 [submodule "mpc"]
 	path = mpc
 	url = https://github.com/orangeduck/mpc.git
+[submodule "sexpresso"]
+	path = sexpresso
+	url = https://github.com/BitPuffin/sexpresso.git
