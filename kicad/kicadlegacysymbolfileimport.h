@@ -44,6 +44,8 @@ private:
     Library *m_library;
     QMap<QString, int> m_pinCountMap;
     void parseTextAstAttributes(mpc_ast_t *refdes_text_ast, Text *text);
+
+    static QMap <QChar, Pin::DirectionEnum> kicadPinDirToEaglePinDir;
 };
 
 #endif // KICADLEGACYSYMBOLFILEIMPORT_H

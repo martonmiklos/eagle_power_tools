@@ -29,8 +29,7 @@ Library* KicadFootprintImport::parseFootprintFile(const QString &libraryPath)
         desc->setValue(QString::fromStdString(description->getChild(1).toString()));
         package->setDescription(desc);
 
-        size_t i = 0;
-        while (1) {
+        for (size_t i = 0; i<module->childCount(); i++) {
             auto child = module->getChild(i);
             if (child.isNil())
                 break;
@@ -48,7 +47,6 @@ Library* KicadFootprintImport::parseFootprintFile(const QString &libraryPath)
                     }
                 }
             }
-            i++;
         }
         libFile.close();
     }
@@ -62,8 +60,9 @@ void KicadFootprintImport::parseText(sexpresso::Sexp &text, Package *package)
     Text *eagleText = new Text();
     auto layer = text.getChildByPath("layer");
     int eagleLayer = -1;
+    QString kicadLayer;
     if (layer) {
-        QString kicadLayer = QString::fromStdString(layer->getChild(1).toString());
+        kicadLayer = QString::fromStdString(layer->getChild(1).toString());
         eagleLayer = KicadLayerToEAGLEMapper::mapKicadStringLayerToEagle(kicadLayer);
         eagleText->setLayer(eagleLayer);
     }
@@ -74,25 +73,30 @@ void KicadFootprintImport::parseText(sexpresso::Sexp &text, Package *package)
         eagleText->setY(-QString::fromStdString(at->getChild(2).toString()).toDouble());
     }
 
-    auto font = text.getChildByPath("effects/font");
-    if (font) {
-        auto size = font->getChildByPath("size");
+    auto size = text.getChildByPath("effects/font/size");
+    if (size)
         eagleText->setSize(QString::fromStdString(size->getChild(2).toString()).toDouble());
 
-        auto thickness = font->getChildByPath("thickness");
+    auto thickness = text.getChildByPath("effects/font/thickness");
+    if (thickness) {
         int ratio = static_cast<int>(100.0 * (QString::fromStdString(thickness->getChild(1).toString()).toDouble() / eagleText->size()));
         eagleText->setRatio(ratio);
     }
 
     if (textType == "reference") {
         eagleText->setValue(">NAME");
-    } else if (textType == "value") {
-        eagleText->setLayer(QString::fromStdString(layer->getChild(1).toString()).startsWith("F")
+        eagleText->setLayer(kicadLayer.startsWith("F")
                             ? 25
-                            : 26);
+                            : 26); // FIXME hardcoded tNames bNames
+    } else if (textType == "value") {
+        eagleText->setLayer(kicadLayer.startsWith("F")
+                            ? 27
+                            : 28); // FIXME hardcoded tValues bValues
         eagleText->setValue(">VALUE");
     } else {
         QString textValue = QString::fromStdString(text.getChild(2).toString());
+        if (textType == "user" && textValue == "%R")
+            textValue = ">NAME";
         eagleText->setValue(textValue);
     }
     eagleText->setAlign(Text::Align_center);

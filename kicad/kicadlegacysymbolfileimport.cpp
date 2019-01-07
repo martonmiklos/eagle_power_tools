@@ -35,6 +35,8 @@ bool KicadLegacySymbolFileImport::parseSymbolLibFile(const QString &libraryPath,
         free(istring);
         return false;
     }
+    Devicesets *dss = new Devicesets();
+    m_library->setDevicesets(dss);
 
     Symbols *symbols = new Symbols();
     m_library->setSymbols(symbols);
@@ -181,15 +183,20 @@ void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast)
         deviceName = QString(name_text->children[1]->children[1]->contents);
     }
 
-    Devicesets *dss = new Devicesets();
     Connects *connects = nullptr;
     mpc_ast_t *footprint_text = mpc_ast_get_child_lb(symbol_ast, "footprint_text|>", 0);
     if (footprint_text) {
         mpc_ast_t *footprint_name_ast = mpc_ast_get_child_lb(footprint_text, "string|>", 0);
         if (footprint_name_ast) {
             QString footprintName(footprint_name_ast->children[1]->contents);
+            // some footprint references are like:
+            // "Housings_SSOP:TSSOP-16_4.4x5mm_Pitch0.65mm"
+            if (footprintName.contains(":")) {
+                footprintName = footprintName.mid(footprintName.indexOf(':') + 1);
+            }
+
             for (Package *pkg : *m_library->packages()->packageList()) {
-                if (pkg->name() == footprintName) {
+                if (pkg->name().toLower() == footprintName.toLower()) {
                     Deviceset *ds = new Deviceset();
                     ds->setPrefix(refdesPrefix);
                     ds->setName(deviceName);
@@ -211,13 +218,13 @@ void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast)
                     Devices *devs = new Devices();
                     ds->setDevices(devs);
                     ds->devices()->addDevice(dev);
-                    dss->addDeviceset(ds);
+                    m_library->devicesets()->addDeviceset(ds);
                     break;
                 }
             }
         }
     }
-    m_library->setDevicesets(dss);
+
 
     mpc_ast_t *drawing_ast = mpc_ast_get_child_lb(symbol_ast, "drawing|>", 0);
     if (drawing_ast) {
@@ -262,7 +269,19 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
     mpc_ast_t *pen_ast = mpc_ast_get_child_lb(rectangle_ast, "pen|>", 0);
     mpc_ast_t *fill_ast = mpc_ast_get_child_lb(rectangle_ast, "fill|char", 0);
 
-    if (QString(fill_ast->contents) == "N") {
+    /* The fill parameter is “f” for a filled shape in the background colour, “F” for a filled shape in
+    the pen colour, or “N” for an unfilled shape. */
+    if (fill_ast && QString(fill_ast->contents) == "F") {
+        // filled rect w pen color
+        Rectangle *rect = new Rectangle();
+
+        rect->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
+        rect->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
+        rect->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
+        rect->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
+        rect->setLayer(94); // FIXME
+        symbol->addRectangle(rect);
+    } else {
         // non filled rect -> add 4 wires
         double width = m_unitConverter.convert(pen_ast->children[0]->contents);
         if (qFuzzyCompare(width, 0)) {
@@ -309,18 +328,45 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
         wire->setX2(m_unitConverter.convert(x1_ast->children[0]->contents));
         wire->setY2(m_unitConverter.convert(y1_ast->children[0]->contents));
         symbol->addWire(wire);
-    } else {
-        // filled rect
-        Rectangle *rect = new Rectangle();
-
-        rect->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
-        rect->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
-        rect->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
-        rect->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
-        rect->setLayer(94); // FIXME
-        symbol->addRectangle(rect);
     }
 }
+
+/*
+Kicad:
+INPUT	I X
+OUTPUT	O X
+BIDI	B X
+TRISTATE	T X
+PASSIVE	P X
+UNSPECIFIED	U
+POWER INPUT	W X
+POWER OUTPUT	w X
+OPEN COLLECTOR	C X
+OPEN EMITTER	E
+NOT CONNECTED	N X
+
+EAGLE:
+NC 		not connected X
+In 		input X
+Out 	output (totem-pole) X
+IO 		in/output (bidirectional) X
+OC 		open collector or open drain X
+Hiz 	high impedance output (e.g. 3-state) X
+Pas 	passive (for resistors, capacitors etc.) X
+Pwr 	power input pin (Vcc, Gnd, Vss, Vdd, etc.) X
+Sup 	general supply pin (e.g. for ground symbol) X
+*/
+QMap<QChar, Pin::DirectionEnum> KicadLegacySymbolFileImport::kicadPinDirToEaglePinDir =
+{
+    {'W', Pin::Direction_pwr},
+    {'w', Pin::Direction_sup},
+    {'I', Pin::Direction_in},
+    {'O', Pin::Direction_out},
+    {'B', Pin::Direction_io},
+    {'C', Pin::Direction_oc},
+    {'N', Pin::Direction_nc},
+    {'T', Pin::Direction_hiz}
+};
 
 void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
                                                  KicadImportSymbol *symbol,
@@ -352,29 +398,34 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
     mpc_ast_t *pin_type_ast = mpc_ast_get_child_lb(pin_ast, "pin_type|char", 0);
     if (pin_type_ast) {
         QString pinType(pin_type_ast->contents);
-        if (pinType == "w") {
-            // power output
-            pin->setDirection(Pin::Direction_pwr);
-        } else if (pinType == "w") {
-            // power input
-            pin->setDirection(Pin::Direction_sup);
-        } else if (pinType == "I") {
-            pin->setDirection(Pin::Direction_in);
-        } else if (pinType == "O") {
-            pin->setDirection(Pin::Direction_out);
-        } else if (pinType == "B") {
-            pin->setDirection(Pin::Direction_io);
-        } else if (pinType == "C") {
-            pin->setDirection(Pin::Direction_oc);
-        } else if (pinType == "N") {
-            pin->setDirection(Pin::Direction_nc);
+        if (kicadPinDirToEaglePinDir.contains(pinType.at(0))) {
+            pin->setDirection(kicadPinDirToEaglePinDir.value(pinType.at(0)));
         } else {
-            pin->setDirection(Pin::Direction_pas);
+            // use EAGLE default here
+            pin->setDirection(Pin::Direction_io);
         }
 
         // quickmess GND always pas FIXME remove once lib QA competed
         if (pin->name() == "GND")
             pin->setDirection(Pin::Direction_pas);
+
+        if (pin->name() == "NC")
+            pin->setDirection(Pin::Direction_nc);
+    }
+
+    mpc_ast_t *length_ast = mpc_ast_get_child_lb(pin_ast, "length|>", 0);
+    if (length_ast) {
+        double length = m_unitConverter.convert(length_ast->children[0]->contents);
+        if (qFuzzyCompare(length, 0)) {
+            pin->setLength(Pin::Length_point);
+        } else if (0 < pin->length() && pin->length() <= 2.54) {
+            pin->setLength(Pin::Length_short);
+        } else if (2.54 < pin->length() && pin->length() <= 5.12) {
+            pin->setLength(Pin::Length_middle);
+        } else {
+            pin->setLength(Pin::Length_long);
+        }
+        // TODO maybe draw the pin line further with a wire but the pin label is fixed anyway
     }
 
     if (symbol->pinNamesVisible() && symbol->pinNumbersVisible())
@@ -395,10 +446,12 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
             if (existingPin->name() == pin->name()) {
                 existingPin->setName(existingPin->name() + "@1");
 
-                foreach (Connect *conn, *connects->connectList()) {
-                    if (conn->pin() == pin->name()) {
-                        conn->setPin(existingPin->name());
-                        break;
+                if (connects) {
+                    foreach (Connect *conn, *connects->connectList()) {
+                        if (conn->pin() == pin->name()) {
+                            conn->setPin(existingPin->name());
+                            break;
+                        }
                     }
                 }
 

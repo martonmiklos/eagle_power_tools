@@ -14,15 +14,16 @@ int main(int argc, char *argv[])
 
 
     KicadFootprintImport import1;
-    EAGLE_LibrarySaver::saveLibrary(import1.parseFootprintFile("/home/mm/TSSOP-20_4.4x6.5mm_Pitch0.65mm.kicad_mod"), "/tmp/foo.lbr");
-    return 0;
+    Library *lib = import1.parseFootprintFile("/home/mm/TSSOP-20_4.4x6.5mm_Pitch0.65mm.kicad_mod");
 
-    KicadLegacyFootprintLibImporter importer2;
-    Library *lib = importer2.parseModFile("/home/mm/AA01B-S040VA1.mod");
+    //return 0;
+
+    /*KicadLegacyFootprintLibImporter importer2;
+    Library *lib = importer2.parseModFile("/home/mm/AA01B-S040VA1.mod");*/
 
     KicadLegacySymbolFileImport importer;
-    importer.parseSymbolLibFile("/home/mm/conn-x220-kb.lib", lib);
-    importer2.save();
+    importer.parseSymbolLibFile("/home/mm/symbol.lib", lib);
+    EAGLE_LibrarySaver::saveLibrary(lib, "/tmp/foo.lbr");
     return 0;
     /*QApplication a(argc, argv);
     MainWindow w;

@@ -31,6 +31,9 @@
   X(header, "header")\
   X(encoding, "encoding")\
   X(symbol, "symbol")\
+  X(fplist, "fplist")\
+  X(fpalias, "fpalias")\
+  X(drawing, "drawing")\
   X(symboldef, "symboldef")\
   X(symbolname, "symbolname")\
   X(prefix, "prefix")\
@@ -53,7 +56,6 @@
   X(datasheet_text, "datasheet_text")\
   X(user_text, "user_text")\
   X(aliases, "aliases")\
-  X(drawing, "drawing")\
   X(arc, "arc")\
   X(radius, "radius")\
   X(start_angle, "start_angle")\
@@ -76,6 +78,8 @@
   X(y1, "y1")\
   X(x2, "x2")\
   X(y2, "y2")\
+  X(italic_text, "italic_text")\
+  X(bold_text, "bold_text")\
   X(text, "text")\
   X(hidden, "hidden")\
   X(angle, "angle")\
@@ -90,5 +94,6 @@
   X(pin_type, "pin_type")\
   X(pin_shape, "pin_shape")\
   X(comment, "comment")\
+  X(anyline, "anyline")\
   X(symbol_lib, "symbol_lib")
 #endif
