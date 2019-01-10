@@ -250,10 +250,28 @@ void KicadLegacySymbolFileImport::parseDrawingAstToSymbol(mpc_ast_t *drawing_ast
     }
 
     for(int i = 0; i >= 0;) {
+        i = mpc_ast_get_index_lb(drawing_ast, "rectangle|>", i);
+        if (i >= 0) {
+            mpc_ast_t *rectangle_ast = mpc_ast_get_child_lb(drawing_ast, "rectangle|>", i);
+            rectangleAstToSymbol(rectangle_ast, symbol);
+            i++;
+        }
+    }
+
+    for(int i = 0; i >= 0;) {
         i = mpc_ast_get_index_lb(drawing_ast, "pin|>", i);
         if (i >= 0) {
             mpc_ast_t *pin_ast = mpc_ast_get_child_lb(drawing_ast, "pin|>", i);
             pinAstToSymbol(pin_ast, symbol, connects);
+            i++;
+        }
+    }
+
+    for(int i = 0; i >= 0;) {
+        i = mpc_ast_get_index_lb(drawing_ast, "polygon|>", i);
+        if (i >= 0) {
+            mpc_ast_t *polygon_ast = mpc_ast_get_child_lb(drawing_ast, "polygon|>", i);
+            polygonAstToSymbol(polygon_ast, symbol);
             i++;
         }
     }
@@ -386,13 +404,14 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
     mpc_ast_t *orientation = mpc_ast_get_child_lb(pin_ast, "pin_orientation|>", 0);
     if (orientation) {
         QString kicadRot(orientation->children[0]->contents);
-        if (kicadRot == "D") { // down
+        if (kicadRot == "U") { // up
             pin->setRot("R90");
         } else if (kicadRot == "L") { // left
             pin->setRot("R180");
-        } else if (kicadRot == "T") { // top
+        } else if (kicadRot == "D") { // down
             pin->setRot("R270");
         }
+        // right is 0 degrees
     }
 
     mpc_ast_t *pin_type_ast = mpc_ast_get_child_lb(pin_ast, "pin_type|char", 0);
@@ -406,7 +425,7 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
         }
 
         // quickmess GND always pas FIXME remove once lib QA competed
-        if (pin->name() == "GND")
+        if (pin->name() == "GND" || pin->name() == "VSS")
             pin->setDirection(Pin::Direction_pas);
 
         if (pin->name() == "NC")
@@ -418,9 +437,9 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
         double length = m_unitConverter.convert(length_ast->children[0]->contents);
         if (qFuzzyCompare(length, 0)) {
             pin->setLength(Pin::Length_point);
-        } else if (0 < pin->length() && pin->length() <= 2.54) {
+        } else if (0 < length && length <= 2.54) {
             pin->setLength(Pin::Length_short);
-        } else if (2.54 < pin->length() && pin->length() <= 5.12) {
+        } else if (2.54 < length && length <= 5.12) {
             pin->setLength(Pin::Length_middle);
         } else {
             pin->setLength(Pin::Length_long);
@@ -475,8 +494,72 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
             }
         }
     }
-
     symbol->addPin(pin);
+}
+
+void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, KicadImportSymbol *symbol)
+{
+    int count = 0;
+    mpc_ast_t *count_ast = mpc_ast_get_child(polygon_ast, "count|>");
+    if (count_ast) {
+        count = QString(count_ast->children[0]->contents).toInt();
+        if (count < 1)
+            return; // malfored polygon wo points
+        Polygon *polygon = nullptr;
+        double width = 0.0;
+        QPointF prevPoint;
+
+        mpc_ast_t * fill_ast = mpc_ast_get_child(polygon_ast, "fill|char");
+        if (fill_ast) {
+            if (QString(fill_ast->contents) == "F") {
+                polygon = new Polygon();
+                polygon->setLayer(94); // FIXME hardcoded symbols layer
+            }
+        }
+
+        mpc_ast_t * pen_ast = mpc_ast_get_child(polygon_ast, "pen|>");
+        if (pen_ast) {
+            width = m_unitConverter.convert(pen_ast->children[0]->contents);
+            // The pen parameter is the thickness of the pen;
+            // when zero, the default pen width is used.
+            if (qFuzzyIsNull(width)) {
+                width = 0.2032; // default is 0.008 inch
+            }
+            if (polygon)
+                polygon->setWidth(width);
+        }
+
+        mpc_ast_t *points_ast = mpc_ast_get_child(polygon_ast, "points|>");
+        for (int i = 0; i<points_ast->children_num; i++) {
+            mpc_ast_t *point = points_ast->children[i];
+            qreal x = m_unitConverter.convert(point->children[0]->children[0]->contents);
+            qreal y = m_unitConverter.convert(point->children[1]->children[0]->contents);
+
+            if (polygon) {
+                Vertex *vertex = new Vertex();
+                vertex->setX(x);
+                vertex->setY(y);
+                vertex->setCurve(0.0);
+                polygon->addVertex(vertex);
+            } else {
+                if (!prevPoint.isNull()) {
+                    Wire *wire = new Wire();
+                    wire->setWidth(width);
+
+                    wire->setLayer(94); // FIXME hardcoded symbols layer
+                    wire->setX1(prevPoint.x());
+                    wire->setY1(prevPoint.y());
+                    wire->setX2(x);
+                    wire->setY2(y);
+                    symbol->addWire(wire);
+                }
+            }
+
+            prevPoint = QPointF(x, y);
+        }
+        if (polygon)
+            symbol->addPolygon(polygon);
+    }
 }
 
 Library *KicadLegacySymbolFileImport::library() const

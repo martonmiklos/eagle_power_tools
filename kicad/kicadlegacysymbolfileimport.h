@@ -40,6 +40,7 @@ private:
     void parseDrawingAstToSymbol(mpc_ast_t *drawing_ast, KicadImportSymbol *symbol, Connects *connects);
     void rectangleAstToSymbol(mpc_ast_t *rectangle_ast, KicadImportSymbol *symbol);
     void pinAstToSymbol(mpc_ast_t *pin_ast, KicadImportSymbol *symbol, Connects *connects);
+    void polygonAstToSymbol(mpc_ast_t *polygon_ast, KicadImportSymbol *symbol);
 
     Library *m_library;
     QMap<QString, int> m_pinCountMap;
