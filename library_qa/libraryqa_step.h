@@ -15,6 +15,8 @@ public:
       Error,
       Passed
     };
+
+
 };
 
 #endif // LIBRARYQA_STEP_H

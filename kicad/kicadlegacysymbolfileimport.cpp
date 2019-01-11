@@ -275,6 +275,24 @@ void KicadLegacySymbolFileImport::parseDrawingAstToSymbol(mpc_ast_t *drawing_ast
             i++;
         }
     }
+
+    for(int i = 0; i >= 0;) {
+        i = mpc_ast_get_index_lb(drawing_ast, "circle|>", i);
+        if (i >= 0) {
+            mpc_ast_t *circle_ast = mpc_ast_get_child_lb(drawing_ast, "circle|>", i);
+            circleAstToSymbol(circle_ast, symbol);
+            i++;
+        }
+    }
+
+    for(int i = 0; i >= 0;) {
+        i = mpc_ast_get_index_lb(drawing_ast, "arc|>", i);
+        if (i >= 0) {
+            mpc_ast_t *arc_ast = mpc_ast_get_child_lb(drawing_ast, "arc|>", i);
+            arcAstToSymbol(arc_ast, symbol);
+            i++;
+        }
+    }
 }
 
 void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast, KicadImportSymbol *symbol)
@@ -507,7 +525,6 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
             return; // malfored polygon wo points
         Polygon *polygon = nullptr;
         double width = 0.0;
-        QPointF prevPoint;
 
         mpc_ast_t * fill_ast = mpc_ast_get_child(polygon_ast, "fill|char");
         if (fill_ast) {
@@ -530,6 +547,8 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
         }
 
         mpc_ast_t *points_ast = mpc_ast_get_child(polygon_ast, "points|>");
+        qreal prevX = 0.0, prevY = 0.0;
+        bool hasPrev = false;
         for (int i = 0; i<points_ast->children_num; i++) {
             mpc_ast_t *point = points_ast->children[i];
             qreal x = m_unitConverter.convert(point->children[0]->children[0]->contents);
@@ -542,24 +561,105 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
                 vertex->setCurve(0.0);
                 polygon->addVertex(vertex);
             } else {
-                if (!prevPoint.isNull()) {
+                if (hasPrev) {
                     Wire *wire = new Wire();
                     wire->setWidth(width);
 
                     wire->setLayer(94); // FIXME hardcoded symbols layer
-                    wire->setX1(prevPoint.x());
-                    wire->setY1(prevPoint.y());
+                    wire->setX1(prevX);
+                    wire->setY1(prevY);
                     wire->setX2(x);
                     wire->setY2(y);
                     symbol->addWire(wire);
+                } else {
+                    hasPrev = true;
                 }
+                prevX = x;
+                prevY = y;
             }
-
-            prevPoint = QPointF(x, y);
         }
         if (polygon)
             symbol->addPolygon(polygon);
     }
+}
+
+void KicadLegacySymbolFileImport::circleAstToSymbol(mpc_ast_t *circle_ast, KicadImportSymbol *symbol)
+{
+    mpc_ast_t *x_ast = mpc_ast_get_child_lb(circle_ast, "x|>", 0);
+    mpc_ast_t *y_ast = mpc_ast_get_child_lb(circle_ast, "y|>", 0);
+    mpc_ast_t *r_ast = mpc_ast_get_child_lb(circle_ast, "radius|>", 0);
+    mpc_ast_t *pen_ast = mpc_ast_get_child_lb(circle_ast, "pen|>", 0);
+    mpc_ast_t *fill_ast = mpc_ast_get_child_lb(circle_ast, "fill|char", 0);
+
+
+    if (fill_ast && QString(fill_ast->contents) == "F") {
+        // filled rect w pen color -> draw polygon instead FIXME
+    } else {
+        Circle *circle = new Circle();
+        circle->setLayer(94); // FIXME hardcoded symbols layer
+        circle->setX(m_unitConverter.convert(x_ast->children[0]->contents));
+        circle->setY(m_unitConverter.convert(y_ast->children[0]->contents));
+        circle->setRadius(m_unitConverter.convert(r_ast->children[0]->contents));
+
+        if (pen_ast) {
+            qreal width = m_unitConverter.convert(pen_ast->children[0]->contents);
+            // The pen parameter is the thickness of the pen;
+            // when zero, the default pen width is used.
+            if (qFuzzyIsNull(width))
+                width = 0.2032; // default is 0.008 inch
+            circle->setWidth(width);
+        }
+        symbol->addCircle(circle);
+    }
+}
+
+void KicadLegacySymbolFileImport::arcAstToSymbol(mpc_ast_t *arc_ast, KicadImportSymbol *symbol)
+{
+    mpc_ast_t *x_start_ast = mpc_ast_get_child_lb(arc_ast, "xstart|>", 0);
+    mpc_ast_t *y_start_ast = mpc_ast_get_child_lb(arc_ast, "ystart|>", 0);
+
+    mpc_ast_t *x_end_ast = mpc_ast_get_child_lb(arc_ast, "xend|>", 0);
+    mpc_ast_t *y_end_ast = mpc_ast_get_child_lb(arc_ast, "yend|float|regex", 0);
+
+    mpc_ast_t *start_angle_ast = mpc_ast_get_child_lb(arc_ast, "start_angle|>", 0);
+    mpc_ast_t *end_angle_ast = mpc_ast_get_child_lb(arc_ast, "end_angle|>", 0);
+
+    mpc_ast_t *pen_ast = mpc_ast_get_child_lb(arc_ast, "pen|>", 0);
+
+    // "A " <x> <y> <radius> <start_angle> <end_angle> <part_index> <dmg> <pen> <fill> <xstart> <ystart> <xend> <yend> <n> ;
+
+    Wire *wire = new Wire();
+    wire->setLayer(94); // FIXME hardcoded symbols layer
+    if (pen_ast) {
+        qreal width = m_unitConverter.convert(pen_ast->children[0]->contents);
+        // The pen parameter is the thickness of the pen;
+        // when zero, the default pen width is used.
+        if (qFuzzyIsNull(width))
+            width = 0.2032; // default is 0.008 inch
+        wire->setWidth(width);
+    }
+
+    double angle = QString(end_angle_ast->children[0]->contents).toDouble() / 10.0 -
+            QString(start_angle_ast->children[0]->contents).toDouble() / 10.0;
+    wire->setCurve(angle);
+
+    if (fabs(angle) > 180.0) {
+        // The arc is drawn in counter-clockwise direction,
+        // but the angles are swapped if there
+        // (normalized) difference exceeds 180 degrees.
+
+        wire->setX2(m_unitConverter.convert(x_start_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convert(y_start_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convert(x_end_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convert(y_end_ast->contents));
+    } else {
+        wire->setX1(m_unitConverter.convert(x_start_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convert(y_start_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convert(x_end_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convert(y_end_ast->contents));
+    }
+
+    symbol->addWire(wire);
 }
 
 Library *KicadLegacySymbolFileImport::library() const
