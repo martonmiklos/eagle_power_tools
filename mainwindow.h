@@ -5,6 +5,7 @@
 
 #include "dialogsettings.h"
 #include "druloader.h"
+#include "library_qa/wizard/libraryqawizard.h"
 
 #include <QCloseEvent>
 #include <QMainWindow>
@@ -19,9 +20,9 @@ class MainWindow : public MainWindowWithRecentList
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    void closeEvent(QCloseEvent *event);
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void on_actionLoad_EAGLE_design_triggered();
@@ -30,18 +31,15 @@ private slots:
     bool openFile(const QString & fileName) override;
 
     void on_actionSettings_triggered();
-
     void on_actionLibrary_QA_triggered();
-
     void on_actionGerber_import_fix_triggered();
-
     void on_actionConvert_Kicad_library_triggered();
 
 private:
     Ui::MainWindow *ui;
-    QSettings m_settings;
     DialogSettings *m_settingsDialog;
     DRULoader *m_dru;
+    LibraryQAWizard *m_libQAWizard = nullptr;
 };
 
 #endif // MAINWINDOW_H

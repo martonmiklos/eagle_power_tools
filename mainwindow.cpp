@@ -89,7 +89,9 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_actionLibrary_QA_triggered()
 {
-
+    if (m_libQAWizard == nullptr)
+        m_libQAWizard = new LibraryQAWizard(this);
+    m_libQAWizard->show();
 }
 
 void MainWindow::on_actionGerber_import_fix_triggered()

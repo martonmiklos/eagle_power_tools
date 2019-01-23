@@ -33,6 +33,7 @@ DESTDIR = bin
 
 include(qt_eagle_xml_parser/eagle.pri)
 include(qmainwindow_with_recent_list/qmainwindow_with_recent_list.pri)
+include(vendor/vendor.pri)
 
 SOURCES += \
         main.cpp \
@@ -56,7 +57,15 @@ SOURCES += \
     kicad/kicadlegacysymbolfileimport.cpp \
     kicad/kicadfootprintimport.cpp \
     sexpresso/sexpresso/sexpresso.cpp \
-    eagle_librarysaver.cpp
+    eagle_librarysaver.cpp \
+    library_qa/symbolpingridcheck.cpp \
+    library_qa/wizard/libraryqawizardselectlibrarypage.cpp \
+    library_qa/wizard/libraryqawizard.cpp \
+    library_qa/wizard/libraryqaselectchecks.cpp \
+    library_qa/wizard/libraryqaselectcomponents.cpp \
+    library_qa/wizard/libraryqaresults.cpp \
+    library_qa/wizard/models/libraryqachecksmodel.cpp \
+    library_qa/wizard/models/libraryelementsmodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -80,12 +89,24 @@ HEADERS += \
     kicad/legacy_symbollib_grammar.h \
     kicad/kicadfootprintimport.h \
     sexpresso/sexpresso/sexpresso.hpp \
-    eagle_librarysaver.h
+    eagle_librarysaver.h \
+    library_qa/symbolpingridcheck.h \
+    library_qa/wizard/libraryqawizardselectlibrarypage.h \
+    library_qa/wizard/libraryqawizard.h \
+    library_qa/wizard/libraryqaselectchecks.h \
+    library_qa/wizard/libraryqaselectcomponents.h \
+    library_qa/wizard/libraryqaresults.h \
+    library_qa/wizard/models/libraryqachecksmodel.h \
+    library_qa/wizard/models/libraryelementssmodel.h
 
 FORMS += \
         mainwindow.ui \
     dialogsettings.ui \
-    dialoggraphicsdebug.ui
+    dialoggraphicsdebug.ui \
+    library_qa/wizard/libraryqawizardselectlibrarypage.ui \
+    library_qa/wizard/libraryqaselectchecks.ui \
+    library_qa/wizard/libraryqaselectcomponents.ui \
+    library_qa/wizard/libraryqaresults.ui
 
 RESOURCES += \
     res/resources.qrc

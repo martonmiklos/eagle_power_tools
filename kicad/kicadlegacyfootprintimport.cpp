@@ -244,6 +244,7 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
     char *istring = nullptr;
 
     Library *lib = new Library();
+    //lib->symbols().symbolList()
 
     if(!handle)
         return nullptr;
