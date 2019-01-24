@@ -1,18 +1,24 @@
-#include "libraryqa_step.h"
+#include "libraryqacheck.h"
 
-LibraryQA_Step::LibraryQA_Step()
+LibraryQA_Check::LibraryQA_Check()
 {
 
 }
 
-LibraryQA_Step::~LibraryQA_Step()
+LibraryQA_Check::LibraryQA_Check(const QString &name) :
+    m_name(name)
 {
 
 }
 
-QList<LibraryQA_StepResult*> LibraryQA_Step::results() const
+QString LibraryQA_Check::name() const
 {
-    return m_results;
+    return m_name;
+}
+
+LibraryQA_Check::~LibraryQA_Check()
+{
+    
 }
 
 

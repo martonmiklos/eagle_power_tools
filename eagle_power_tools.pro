@@ -48,8 +48,7 @@ SOURCES += \
     eaglerc/palette.cpp \
     eaglerc/eaglesettings.cpp \
     dialoggraphicsdebug.cpp \
-    library_qa/libraryqa_step.cpp \
-    library_qa/checknamesandvalues.cpp \
+    library_qa/checks/checknamesandvalues.cpp \
     gerberimportfixer.cpp \
     mpc/mpc.c \
     kicad/kicadlegacyfootprintimport.cpp \
@@ -65,7 +64,9 @@ SOURCES += \
     library_qa/wizard/libraryqaselectcomponents.cpp \
     library_qa/wizard/libraryqaresults.cpp \
     library_qa/wizard/models/libraryqachecksmodel.cpp \
-    library_qa/wizard/models/libraryelementsmodel.cpp
+    library_qa/wizard/models/libraryelementsmodel.cpp \
+    library_qa/libraryqacheck.cpp \
+    library_qa/libraryqachecksregistry.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -79,8 +80,7 @@ HEADERS += \
     eaglerc/palette.h \
     eaglerc/eaglesettings.h \
     dialoggraphicsdebug.h \
-    library_qa/libraryqa_step.h \
-    library_qa/checknamesandvalues.h \
+    library_qa/checks/checknamesandvalues.h \
     gerberimportfixer.h \
     mpc/mpc.h \
     kicad/kicadlegacyfootprintimport.h \
@@ -97,7 +97,9 @@ HEADERS += \
     library_qa/wizard/libraryqaselectcomponents.h \
     library_qa/wizard/libraryqaresults.h \
     library_qa/wizard/models/libraryqachecksmodel.h \
-    library_qa/wizard/models/libraryelementssmodel.h
+    library_qa/wizard/models/libraryelementssmodel.h \
+    library_qa/libraryqacheck.h \
+    library_qa/libraryqachecksregistry.h
 
 FORMS += \
         mainwindow.ui \

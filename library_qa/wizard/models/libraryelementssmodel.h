@@ -13,12 +13,24 @@ public:
     enum LibraryElementType {
         Sybmol,
         Package,
-        DeviceSet
+        Deviceset
     };
 
     enum Columns {
         ColElementName,
         ColChecked
+    };
+
+    enum TreeElementType {
+        GroupElementsBegin,
+        SymbolsGroup,
+        PackagesGroup,
+        DevicesetsGroup,
+        GroupElementsEnd,
+        SymbolElement,
+        PackageElement,
+        DevicesetElement,
+        TreeElementTypeInvalid
     };
 
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
@@ -30,11 +42,12 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
+    bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
 
     void setLibrary(Library *lib);
 
 private:
-    Symbol::List m_symbolList;
+    Symbol::List m_symbols;
     Package::List m_packages;
     Deviceset::List m_devicesets;
 };

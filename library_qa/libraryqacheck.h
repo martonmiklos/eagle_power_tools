@@ -40,18 +40,34 @@ private:
     bool m_highlight;
 };
 
-class LibraryQA_Step
+class LibraryQA_Check
 {
 public:
-    LibraryQA_Step();
-    virtual ~LibraryQA_Step() = 0;
+    LibraryQA_Check();
+    LibraryQA_Check(const QString & name);
+    virtual ~LibraryQA_Check() = 0;
 
-    virtual bool check(Library *library) = 0;
-    virtual bool fix(Library *library) = 0;
-    QList<LibraryQA_StepResult *> results() const;
+    enum CheckTarget {
+        CheckTarget_Symbol,
+        CheckTarget_Package,
+        CheckTarget_Deviceset
+    };
+
+    virtual bool checkPackage(Package *package) = 0;
+    virtual bool checkSymbol(Symbol *symbol) = 0;
+    virtual bool checkDeviceset(Deviceset *ds) = 0;
+
+    virtual bool fixPackage(Package *package, LibraryQA_StepResult *result) = 0;
+    virtual bool fixSymbol(Symbol *symbol, LibraryQA_StepResult *result) = 0;
+    virtual bool fixDeviceset(Deviceset *ds, LibraryQA_StepResult *result) = 0;
+
+    virtual QList<CheckTarget> targets() const = 0;
+
+
+    QString name() const;
 
 protected:
-    QList<LibraryQA_StepResult*> m_results;
+    QString m_name;
 };
 
 #endif // LIBRARYQA_STEP_H

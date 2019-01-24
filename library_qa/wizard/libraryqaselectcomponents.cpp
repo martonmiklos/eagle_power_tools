@@ -20,4 +20,6 @@ void LibraryQASelectComponents::setLibrary(Library *lib)
 {
     m_model->setLibrary(lib);
     ui->treeViewComponentsToCheck->setModel(m_model);
+    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryElementsModel::ColElementName, QHeaderView::Stretch);
+    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryElementsModel::ColChecked, QHeaderView::ResizeToContents);
 }

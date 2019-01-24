@@ -1,9 +1,9 @@
 #ifndef SYMBOLPINGRIDCHECK_H
 #define SYMBOLPINGRIDCHECK_H
 
-#include "libraryqa_step.h"
+#include "libraryqacheck.h"
 
-class SymbolPinGridCheck : public LibraryQA_Step
+class SymbolPinGridCheck : public LibraryQA_Check
 {
 public:
     SymbolPinGridCheck();

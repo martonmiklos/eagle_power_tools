@@ -1,5 +1,6 @@
 #include "libraryelementssmodel.h"
 
+
 LibraryElementsModel::LibraryElementsModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
@@ -10,15 +11,46 @@ QModelIndex LibraryElementsModel::index(int row, int column, const QModelIndex &
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
-    return createIndex(row, column, parent.row() + 1);
+
+    if (!parent.isValid()) {
+        switch (static_cast<LibraryElementType>(row)) {
+        case LibraryElementsModel::Sybmol:
+            return createIndex(row, column, SymbolsGroup);
+        case LibraryElementsModel::Package:
+            return createIndex(row, column, PackagesGroup);
+        case LibraryElementsModel::Deviceset:
+            return createIndex(row, column, DevicesetsGroup);
+        }
+    } else {
+        switch (static_cast<TreeElementType>(parent.internalId())) {
+        case LibraryElementsModel::SymbolsGroup:
+            return createIndex(row, column, SymbolElement);
+        case LibraryElementsModel::PackagesGroup:
+            return createIndex(row, column, PackageElement);
+        case LibraryElementsModel::DevicesetsGroup:
+            return createIndex(row, column, DevicesetElement);
+        default:
+            return QModelIndex();
+        }
+    }
+    return QModelIndex();
 }
 
 QModelIndex LibraryElementsModel::parent(const QModelIndex &child) const
 {
-    if (!child.isValid() || child.column() != 0 || child.internalId() == 0)
+    if (!child.isValid())
         return QModelIndex();
 
-    return createIndex(child.column(), child.internalId() - 1);
+    switch (static_cast<TreeElementType>(child.internalId())) {
+    case TreeElementType::SymbolElement:
+        return createIndex(Sybmol, 0, SymbolsGroup);
+    case TreeElementType::PackageElement:
+        return createIndex(Package, 0, PackagesGroup);
+    case TreeElementType::DevicesetElement:
+        return createIndex(Deviceset, 0, DevicesetsGroup);
+    default:
+        return QModelIndex();
+    }
 }
 
 QVariant LibraryElementsModel::data(const QModelIndex &index, int role) const
@@ -29,23 +61,20 @@ QVariant LibraryElementsModel::data(const QModelIndex &index, int role) const
                 switch (static_cast<LibraryElementType>(index.row())) {
                 case LibraryElementsModel::Sybmol:
                     return tr("Symbol");
-                    break;
                 case LibraryElementsModel::Package:
                     return tr("Footprint");
-                    break;
-                case LibraryElementsModel::DeviceSet:
+                case LibraryElementsModel::Deviceset:
                     return tr("Device");
-                    break;
                 }
             }
         } else {
             if (index.column() == ColElementName) {
                 switch (static_cast<LibraryElementType>(index.parent().row())) {
                 case LibraryElementsModel::Sybmol:
-                    return m_symbolList.at(index.row())->name();
+                    return m_symbols.at(index.row())->name();
                 case LibraryElementsModel::Package:
                     return m_packages.at(index.row())->name();
-                case LibraryElementsModel::DeviceSet:
+                case LibraryElementsModel::Deviceset:
                     return m_devicesets.at(index.row())->name();
                 }
             }
@@ -58,6 +87,12 @@ QVariant LibraryElementsModel::data(const QModelIndex &index, int role) const
 
 bool LibraryElementsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    if (index.parent().isValid()
+            && index.column() == ColChecked
+            && role == Qt::CheckStateRole) {
+        // TODO check!
+        bool checked = value.toBool();
+    }
     return true;
 }
 
@@ -65,9 +100,9 @@ QVariant LibraryElementsModel::headerData(int section, Qt::Orientation orientati
 {
     if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
         switch (section) {
-        case 0:
+        case ColElementName:
             return tr("Element");
-        case 1:
+        case ColChecked:
             return tr("Check");
         }
     }
@@ -76,25 +111,28 @@ QVariant LibraryElementsModel::headerData(int section, Qt::Orientation orientati
 
 Qt::ItemFlags LibraryElementsModel::flags(const QModelIndex &index) const
 {
-    if (index.parent().isValid() && index.column() == ColChecked) {
-        return Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+    if (index.isValid() && index.column() == ColChecked) {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
     }
     return Qt::ItemIsEnabled;
 }
 
 int LibraryElementsModel::rowCount(const QModelIndex &parent) const
 {
-    if (parent.isValid()) {
-        switch (static_cast<LibraryElementType>(parent.row())) {
-        case LibraryElementsModel::Sybmol:
-            return m_symbolList.count();
-        case LibraryElementsModel::Package:
+    if (!parent.isValid())
+        return 3;
+    else {
+        switch (static_cast<TreeElementType>(parent.internalId())) {
+        case LibraryElementsModel::SymbolsGroup:
+            return  m_symbols.count();
+        case LibraryElementsModel::PackagesGroup:
             return m_packages.count();
-        case LibraryElementsModel::DeviceSet:
-            return m_devicesets.count();
+        case LibraryElementsModel::DevicesetsGroup:
+            return  m_devicesets.count();
+        default:
+            return 0;
         }
     }
-    return 3;
 }
 
 int LibraryElementsModel::columnCount(const QModelIndex &parent) const
@@ -103,16 +141,25 @@ int LibraryElementsModel::columnCount(const QModelIndex &parent) const
     return 2;
 }
 
+bool LibraryElementsModel::hasChildren(const QModelIndex &parent) const
+{
+    if (!parent.isValid())
+        return true;
+    return GroupElementsBegin < parent.internalId() && parent.internalId() < GroupElementsEnd;
+}
+
 void LibraryElementsModel::setLibrary(Library *lib)
 {
-    m_symbolList.clear();
+    beginResetModel();
+    m_symbols.clear();
     m_packages.clear();
     m_devicesets.clear();
 
     if (!lib)
         return;
 
-    m_symbolList = *lib->symbols()->symbolList();
+    m_symbols = *lib->symbols()->symbolList();
     m_packages = *lib->packages()->packageList();
     m_devicesets = *lib->devicesets()->devicesetList();
+    endResetModel();
 }

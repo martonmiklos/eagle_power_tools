@@ -1,7 +1,7 @@
 #ifndef LIBRARYQACHECKSMODEL_H
 #define LIBRARYQACHECKSMODEL_H
 
-#include "library_qa/libraryqa_step.h"
+#include "library_qa/libraryqacheck.h"
 
 #include <QAbstractItemModel>
 
