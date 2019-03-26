@@ -26,16 +26,15 @@ bool CheckNamesAndValues::checkPackage(Package *pkg)
     Text *nameText = nullptr;
     Text *valueText = nullptr;
     for (Text *text : *pkg->textList()) {
-        // FIXME hardcoded names layer
         if (m_checkNames && text->value() == ">NAME") {
-            if (text->layer() == 95)
+            if (text->layer() == EagleLayers::Names)
                 hasName = true;
             else
                 nameText = text;
         }
 
         if (m_checkValues && text->value() == ">VALUE") {
-            if (text->layer() == 96)
+            if (text->layer() == EagleLayers::Values)
                 hasValue = true;
             else
                 valueText = text;
@@ -103,17 +102,15 @@ bool CheckNamesAndValues::checkSymbol(Symbol *sym)
     Text *nameText = nullptr;
     Text *valueText = nullptr;
     for (Text *text : *sym->textList()) {
-        // FIXME hardcoded tNames layer
         if (m_checkNames && text->value() == ">NAME") {
-            if (text->layer() == 25)
+            if (text->layer() == EagleLayers::tNames)
                 hasName = true;
             else
                 nameText = text;
         }
 
-        // FIXME hardcoded tValues layer
         if (m_checkValues && text->value() == ">VALUE") {
-            if (text->layer() == 27)
+            if (text->layer() == EagleLayers::tValues)
                 hasValue = true;
             else
                 valueText = text;
@@ -194,9 +191,9 @@ bool CheckNamesAndValues::fix(CheckNamesAndValuesResult *CNVRes)
     case CheckNamesAndValuesResult::Name:
         if (CNVRes->text()) {
             if (CNVRes->symbol())
-                CNVRes->text()->setLayer(95); // FIXME hardcoded Names layer
+                CNVRes->text()->setLayer(EagleLayers::Names);
             else if (CNVRes->pkg())
-                CNVRes->text()->setLayer(25); // FIXME hardcoded tNames layer
+                CNVRes->text()->setLayer(EagleLayers::tNames);
         } else {
             //lib->pac
         }
@@ -204,9 +201,9 @@ bool CheckNamesAndValues::fix(CheckNamesAndValuesResult *CNVRes)
     case CheckNamesAndValuesResult::Value:
         if (CNVRes->text()) {
             if (CNVRes->symbol())
-                CNVRes->text()->setLayer(96); // FIXME hardcoded Values layer
+                CNVRes->text()->setLayer(EagleLayers::Values);
             else if (CNVRes->pkg())
-                CNVRes->text()->setLayer(27); // FIXME hardcoded tValues layer
+                CNVRes->text()->setLayer(EagleLayers::tValues);
         } else {
             //lib->pac
         }

@@ -1,6 +1,6 @@
 #include "kicadlegacysymbolfileimport.h"
 
-
+#include "qt_eagle_xml_parser/eaglelayers.h"
 #include "legacy_symbollib_grammar.h"
 
 #include <QDebug>
@@ -163,7 +163,7 @@ void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast)
     mpc_ast_t *refdes_text_ast = mpc_ast_get_child_lb(symbol_ast, "refdes_text|>", 0);
     if (refdes_text_ast) {
         Text *text = new Text();
-        text->setLayer(95); // FIXME hardcoded NAMES layer
+        text->setLayer(EagleLayers::Names);
         text->setValue(">NAME");
         parseTextAstAttributes(refdes_text_ast, text);
         symbol->addText(text);
@@ -174,7 +174,7 @@ void KicadLegacySymbolFileImport::parseSymbolAstToLibrary(mpc_ast_t *symbol_ast)
     mpc_ast_t *name_text = mpc_ast_get_child_lb(symbol_ast, "name_text|>", 0);
     if (name_text) {
         Text *text = new Text();
-        text->setLayer(96); // FIXME hardcoded VALUES layer
+        text->setLayer(EagleLayers::Values);
         text->setValue(">VALUE");
         parseTextAstAttributes(name_text, text);
 
@@ -315,7 +315,7 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
         rect->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
         rect->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
         rect->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
-        rect->setLayer(94); // FIXME
+        rect->setLayer(EagleLayers::Symbols);
         symbol->addRectangle(rect);
     } else {
         // non filled rect -> add 4 wires
@@ -327,7 +327,7 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
         }
         Wire *wire = new Wire();
         wire->setWidth(width);
-        wire->setLayer(94);
+        wire->setLayer(EagleLayers::Symbols);
 
         wire->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
         wire->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
@@ -337,7 +337,7 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
 
         wire = new Wire();
         wire->setWidth(width);
-        wire->setLayer(94);
+        wire->setLayer(EagleLayers::Symbols);
 
         wire->setX1(m_unitConverter.convert(x2_ast->children[0]->contents));
         wire->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
@@ -347,7 +347,7 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
 
         wire = new Wire();
         wire->setWidth(width);
-        wire->setLayer(94);
+        wire->setLayer(EagleLayers::Symbols);
 
         wire->setX1(m_unitConverter.convert(x2_ast->children[0]->contents));
         wire->setY1(m_unitConverter.convert(y2_ast->children[0]->contents));
@@ -357,7 +357,7 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
 
         wire = new Wire();
         wire->setWidth(width);
-        wire->setLayer(94);
+        wire->setLayer(EagleLayers::Symbols);
 
         wire->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
         wire->setY1(m_unitConverter.convert(y2_ast->children[0]->contents));
@@ -530,7 +530,7 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
         if (fill_ast) {
             if (QString(fill_ast->contents) == "F") {
                 polygon = new Polygon();
-                polygon->setLayer(94); // FIXME hardcoded symbols layer
+                polygon->setLayer(EagleLayers::Symbols);
             }
         }
 
@@ -565,7 +565,7 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
                     Wire *wire = new Wire();
                     wire->setWidth(width);
 
-                    wire->setLayer(94); // FIXME hardcoded symbols layer
+                    wire->setLayer(EagleLayers::Symbols);
                     wire->setX1(prevX);
                     wire->setY1(prevY);
                     wire->setX2(x);
@@ -596,7 +596,7 @@ void KicadLegacySymbolFileImport::circleAstToSymbol(mpc_ast_t *circle_ast, Kicad
         // filled rect w pen color -> draw polygon instead FIXME
     } else {
         Circle *circle = new Circle();
-        circle->setLayer(94); // FIXME hardcoded symbols layer
+        circle->setLayer(EagleLayers::Symbols);
         circle->setX(m_unitConverter.convert(x_ast->children[0]->contents));
         circle->setY(m_unitConverter.convert(y_ast->children[0]->contents));
         circle->setRadius(m_unitConverter.convert(r_ast->children[0]->contents));
@@ -629,7 +629,7 @@ void KicadLegacySymbolFileImport::arcAstToSymbol(mpc_ast_t *arc_ast, KicadImport
     // "A " <x> <y> <radius> <start_angle> <end_angle> <part_index> <dmg> <pen> <fill> <xstart> <ystart> <xend> <yend> <n> ;
 
     Wire *wire = new Wire();
-    wire->setLayer(94); // FIXME hardcoded symbols layer
+    wire->setLayer(EagleLayers::Symbols);
     if (pen_ast) {
         qreal width = m_unitConverter.convert(pen_ast->children[0]->contents);
         // The pen parameter is the thickness of the pen;

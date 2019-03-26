@@ -119,3 +119,11 @@ void MainWindow::on_actionConvert_Kicad_library_triggered()
         m_settings.setValue("lastKicadLibFile", lastKicadLibFile);
     }
 }
+
+void MainWindow::on_actionImport_Accel_ascii_triggered()
+{
+    if (m_accelImportDialog == nullptr) {
+        m_accelImportDialog = new DialogAccelAsciiImport(this);
+    }
+    m_accelImportDialog->show();
+}

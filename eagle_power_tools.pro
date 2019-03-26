@@ -66,7 +66,10 @@ SOURCES += \
     library_qa/wizard/models/libraryqachecksmodel.cpp \
     library_qa/wizard/models/libraryelementsmodel.cpp \
     library_qa/libraryqacheck.cpp \
-    library_qa/libraryqachecksregistry.cpp
+    library_qa/libraryqachecksregistry.cpp \
+    accel_ascii/dialogaccelasciiimport.cpp \
+    accel_ascii/dialogaccelasciiimport_settings.cpp \
+    accel_ascii/accelimporter.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -99,7 +102,9 @@ HEADERS += \
     library_qa/wizard/models/libraryqachecksmodel.h \
     library_qa/wizard/models/libraryelementssmodel.h \
     library_qa/libraryqacheck.h \
-    library_qa/libraryqachecksregistry.h
+    library_qa/libraryqachecksregistry.h \
+    accel_ascii/dialogaccelasciiimport.h \
+    accel_ascii/accelimporter.h
 
 FORMS += \
         mainwindow.ui \
@@ -108,7 +113,8 @@ FORMS += \
     library_qa/wizard/libraryqawizardselectlibrarypage.ui \
     library_qa/wizard/libraryqaselectchecks.ui \
     library_qa/wizard/libraryqaselectcomponents.ui \
-    library_qa/wizard/libraryqaresults.ui
+    library_qa/wizard/libraryqaresults.ui \
+    accel_ascii/dialogaccelasciiimport.ui
 
 RESOURCES += \
     res/resources.qrc

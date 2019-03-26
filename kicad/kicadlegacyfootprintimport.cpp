@@ -1,6 +1,7 @@
 #include "kicadlegacyfootprintimport.h"
 
 #include "unitutilities.h"
+#include "qt_eagle_xml_parser/eaglelayers.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -493,9 +494,7 @@ void KicadLegacyFootprintLibImporter::parsePadsAstToPackage(mpc_ast_t *pads_ast,
                                 quint16 mask = QString(mask_ast->contents).toInt(nullptr, 16);
 
                                 if (mask & (1<<0)) {
-                                    // bottom layer
-                                    // FIXME
-                                    smd->setLayer(16);
+                                    smd->setLayer(EagleLayers::Bottom);
                                     smd->setStop(
                                                 (mask & (1<<KicadLayerToEAGLEMapper::BMask))
                                                 ? Smd::Stop_yes
@@ -506,9 +505,7 @@ void KicadLegacyFootprintLibImporter::parsePadsAstToPackage(mpc_ast_t *pads_ast,
                                                 ? Smd::Cream_yes
                                                 : Smd::Cream_no);
                                 } else if (mask & (1<<15)) {
-                                    // top layer
-                                    // FIXME
-                                    smd->setLayer(1);
+                                    smd->setLayer(EagleLayers::Top);
                                     smd->setStop(
                                                 (mask & (1<<KicadLayerToEAGLEMapper::FMask))
                                                 ? Smd::Stop_yes

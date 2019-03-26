@@ -2,6 +2,7 @@
 #define LIBRARYQA_STEP_H
 
 #include "../qt_eagle_xml_parser/eagle.h"
+#include "../qt_eagle_xml_parser/eaglelayers.h"
 
 class LibraryQA_StepResult
 {

@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include "../qt_eagle_xml_parser/unitutilities.h"
+#include "../qt_eagle_xml_parser/eaglelayers.h"
 
 KicadUnitConverter::Mode KicadUnitConverter::mode() const
 {
@@ -32,37 +33,37 @@ KicadUnitConverter::KicadUnitConverter(KicadUnitConverter::Mode mode) :
 
 QMap<KicadLayerToEAGLEMapper::KicadLayer, int> KicadLayerToEAGLEMapper::kicadToEagleLayerMap =
 {
-    {BAdhes, 36}, // bGlue
-    {FAdhes, 35}, // tGlue
-    {BPaste, 30}, // bStop
-    {FPaste, 29}, // tStop
-    {BSilkS, 22}, // bPlace
-    {FSilkS, 21}, // tPlace
-    {BMask, 29}, // bStop
-    {FMask, 30}, // tStop
-    {DwgsUser, 51}, // tDocu
-    {CmtsUser, 51}, // tDocu
-    {EdgeCuts, 20}, // Dimension
+    {BAdhes, EagleLayers::bGlue},
+    {FAdhes, EagleLayers::tGlue},
+    {BPaste, EagleLayers::bStop},
+    {FPaste, EagleLayers::tStop},
+    {BSilkS, EagleLayers::bPlace},
+    {FSilkS, EagleLayers::tPlace},
+    {BMask, EagleLayers::bStop},
+    {FMask, EagleLayers::tStop},
+    {DwgsUser, EagleLayers::tDocu},
+    {CmtsUser, EagleLayers::tDocu},
+    {EdgeCuts, EagleLayers::Dimension},
 };
 
 QMap<QString, int> KicadLayerToEAGLEMapper::kicadStringToEagleLayerMap =
 {
-    {"F.Cu", 1}, // Top
-    {"B.Cu", 16}, // Bottom
-    {"B.Adhes", 36}, // bGlue
-    {"F.Adhes", 35}, // tGlue
-    {"B.Paste", 30}, // bStop
-    {"F.Paste", 29}, // tStop
-    {"B.SilkS", 22}, // bPlace
-    {"F.SilkS", 21}, // tPlace
-    {"B.Mask", 29}, // bStop
-    {"F.Mask", 30}, // tStop
-    {"DwgsUser", 51}, // tDocu
-    {"CmtsUser", 51}, // tDocu
-    {"F.CrtYd", 39}, // tKeepOut
-    {"B.CrtYd", 40}, // bKeepOut
-    {"F.Fab", 51}, // tDocu
-    {"B.Fab", 52} // bDocu
+    {"F.Cu", EagleLayers::Top},
+    {"B.Cu", EagleLayers::Bottom},
+    {"B.Adhes", EagleLayers::bGlue},
+    {"F.Adhes", EagleLayers::tGlue},
+    {"B.Paste", EagleLayers::bStop},
+    {"F.Paste", EagleLayers::tStop},
+    {"B.SilkS", EagleLayers::bPlace},
+    {"F.SilkS", EagleLayers::tPlace},
+    {"B.Mask", EagleLayers::bStop},
+    {"F.Mask", EagleLayers::tStop},
+    {"DwgsUser", EagleLayers::tDocu},
+    {"CmtsUser", EagleLayers::tDocu},
+    {"F.CrtYd", EagleLayers::tKeepout},
+    {"B.CrtYd", EagleLayers::bKeepout},
+    {"F.Fab", EagleLayers::tDocu},
+    {"B.Fab", EagleLayers::bDocu}
 };
 
 
@@ -90,6 +91,8 @@ int KicadLayerToEAGLEMapper::mapKicadStringLayerToEagle(const QString & kicadLay
         int internalnumber = kicadLayer.mid(2).toInt();
         if (internalnumber < 8 || internalnumber > 23)
             return internalnumber + 1;
+        else
+            return -1;
     }
 
     if (kicadStringToEagleLayerMap.contains(kicadLayer))

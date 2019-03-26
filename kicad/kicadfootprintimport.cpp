@@ -1,5 +1,7 @@
 #include "kicadfootprintimport.h"
 
+#include "qt_eagle_xml_parser/eaglelayers.h"
+
 #include <QDebug>
 #include <QFile>
 
@@ -86,12 +88,12 @@ void KicadFootprintImport::parseText(sexpresso::Sexp &text, Package *package)
     if (textType == "reference") {
         eagleText->setValue(">NAME");
         eagleText->setLayer(kicadLayer.startsWith("F")
-                            ? 25
-                            : 26); // FIXME hardcoded tNames bNames
+                            ? EagleLayers::tNames
+                            : EagleLayers::bNames);
     } else if (textType == "value") {
         eagleText->setLayer(kicadLayer.startsWith("F")
-                            ? 27
-                            : 28); // FIXME hardcoded tValues bValues
+                            ? EagleLayers::tValues
+                            : EagleLayers::bValues);
         eagleText->setValue(">VALUE");
     } else {
         QString textValue = QString::fromStdString(text.getChild(2).toString());

@@ -3,6 +3,7 @@
 
 #include "qmainwindow_with_recent_list/mainwindowwithrecentlist.h"
 
+#include "accel_ascii/dialogaccelasciiimport.h"
 #include "dialogsettings.h"
 #include "druloader.h"
 #include "library_qa/wizard/libraryqawizard.h"
@@ -27,17 +28,17 @@ public:
 private slots:
     void on_actionLoad_EAGLE_design_triggered();
     void on_actionSilkscreen_slicer_triggered();
-
     bool openFile(const QString & fileName) override;
-
     void on_actionSettings_triggered();
     void on_actionLibrary_QA_triggered();
     void on_actionGerber_import_fix_triggered();
     void on_actionConvert_Kicad_library_triggered();
+    void on_actionImport_Accel_ascii_triggered();
 
 private:
     Ui::MainWindow *ui;
     DialogSettings *m_settingsDialog;
+    DialogAccelAsciiImport *m_accelImportDialog = nullptr;
     DRULoader *m_dru;
     LibraryQAWizard *m_libQAWizard = nullptr;
 };
