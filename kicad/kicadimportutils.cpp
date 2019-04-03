@@ -15,7 +15,7 @@ void KicadUnitConverter::setMode(const Mode &mode)
     m_mode = mode;
 }
 
-double KicadUnitConverter::convert(const QString &kicadData)
+double KicadUnitConverter::convertTo_mm(const QString &kicadData)
 {
     if (m_mode == DeciMil) {
         return UnitUtilities::milToMm(kicadData.toDouble() / 10.0);
@@ -103,12 +103,6 @@ int KicadLayerToEAGLEMapper::mapKicadStringLayerToEagle(const QString & kicadLay
     return -1;
 }
 
-
-const char *emsg(void)
-{
-    return errno ? strerror(errno) : "unknown reason";
-}
-
 /**@warning does not work for large file >4GB */
 char *slurp(FILE *f)
 {
@@ -131,7 +125,6 @@ char *slurp(FILE *f)
     return b;
 fail:
     free(b);
-    fprintf(stderr, "slurp failed: %s", emsg());
     return NULL;
 }
 

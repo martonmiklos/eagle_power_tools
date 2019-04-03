@@ -1,7 +1,7 @@
 #include "kicadlegacysymbolfileimport.h"
 
 #include "qt_eagle_xml_parser/eaglelayers.h"
-#include "legacy_symbollib_grammar.h"
+#include "kicadlegacysymbolgrammar.h"
 
 #include <QDebug>
 
@@ -95,11 +95,11 @@ void KicadLegacySymbolFileImport::parseTextAstAttributes(mpc_ast_t *text_ast, Te
     mpc_ast_t *x_ast = mpc_ast_get_child_lb(text_ast, "x|>", 0);
     mpc_ast_t *y_ast = mpc_ast_get_child_lb(text_ast, "y|>", 0);
 
-    text->setX(m_unitConverter.convert(x_ast->children[0]->contents));
-    text->setY(m_unitConverter.convert(y_ast->children[0]->contents));
+    text->setX(m_unitConverter.convertTo_mm(x_ast->children[0]->contents));
+    text->setY(m_unitConverter.convertTo_mm(y_ast->children[0]->contents));
 
     mpc_ast_t *size_ast = mpc_ast_get_child_lb(text_ast, "size|>", 0);
-    text->setSize(m_unitConverter.convert(size_ast->children[0]->contents));
+    text->setSize(m_unitConverter.convertTo_mm(size_ast->children[0]->contents));
 
     mpc_ast_t *orientation = mpc_ast_get_child_lb(text_ast, "orientation|>", 0);
     if (QString(orientation->children[0]->contents) == "V")
@@ -311,15 +311,15 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
         // filled rect w pen color
         Rectangle *rect = new Rectangle();
 
-        rect->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
-        rect->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
-        rect->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
-        rect->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
+        rect->setX1(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+        rect->setY1(m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
+        rect->setX2(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+        rect->setY2(m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
         rect->setLayer(EagleLayers::Symbols);
         symbol->addRectangle(rect);
     } else {
         // non filled rect -> add 4 wires
-        double width = m_unitConverter.convert(pen_ast->children[0]->contents);
+        double width = m_unitConverter.convertTo_mm(pen_ast->children[0]->contents);
         if (qFuzzyCompare(width, 0)) {
             /* The pen parameter is the thickness of the pen; when zero, the default pen
             width is used. */
@@ -329,40 +329,40 @@ void KicadLegacySymbolFileImport::rectangleAstToSymbol(mpc_ast_t *rectangle_ast,
         wire->setWidth(width);
         wire->setLayer(EagleLayers::Symbols);
 
-        wire->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
-        wire->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y1_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
         symbol->addWire(wire);
 
         wire = new Wire();
         wire->setWidth(width);
         wire->setLayer(EagleLayers::Symbols);
 
-        wire->setX1(m_unitConverter.convert(x2_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y1_ast->children[0]->contents));
-        wire->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
         symbol->addWire(wire);
 
         wire = new Wire();
         wire->setWidth(width);
         wire->setLayer(EagleLayers::Symbols);
 
-        wire->setX1(m_unitConverter.convert(x2_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y2_ast->children[0]->contents));
-        wire->setX2(m_unitConverter.convert(x1_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y2_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
         symbol->addWire(wire);
 
         wire = new Wire();
         wire->setWidth(width);
         wire->setLayer(EagleLayers::Symbols);
 
-        wire->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y2_ast->children[0]->contents));
-        wire->setX2(m_unitConverter.convert(x1_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y1_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
         symbol->addWire(wire);
     }
 }
@@ -394,6 +394,7 @@ Sup 	general supply pin (e.g. for ground symbol) X
 */
 QMap<QChar, Pin::DirectionEnum> KicadLegacySymbolFileImport::kicadPinDirToEaglePinDir =
 {
+    {'P', Pin::Direction_pas},
     {'W', Pin::Direction_pwr},
     {'w', Pin::Direction_sup},
     {'I', Pin::Direction_in},
@@ -416,8 +417,8 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
     mpc_ast_t *x_ast = mpc_ast_get_child_lb(pin_ast, "x|>", 0);
     mpc_ast_t *y_ast = mpc_ast_get_child_lb(pin_ast, "y|>", 0);
 
-    pin->setX(m_unitConverter.convert(x_ast->children[0]->contents));
-    pin->setY(m_unitConverter.convert(y_ast->children[0]->contents));
+    pin->setX(m_unitConverter.convertTo_mm(x_ast->children[0]->contents));
+    pin->setY(m_unitConverter.convertTo_mm(y_ast->children[0]->contents));
 
     mpc_ast_t *orientation = mpc_ast_get_child_lb(pin_ast, "pin_orientation|>", 0);
     if (orientation) {
@@ -452,7 +453,7 @@ void KicadLegacySymbolFileImport::pinAstToSymbol(mpc_ast_t *pin_ast,
 
     mpc_ast_t *length_ast = mpc_ast_get_child_lb(pin_ast, "length|>", 0);
     if (length_ast) {
-        double length = m_unitConverter.convert(length_ast->children[0]->contents);
+        double length = m_unitConverter.convertTo_mm(length_ast->children[0]->contents);
         if (qFuzzyCompare(length, 0)) {
             pin->setLength(Pin::Length_point);
         } else if (0 < length && length <= 2.54) {
@@ -536,7 +537,7 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
 
         mpc_ast_t * pen_ast = mpc_ast_get_child(polygon_ast, "pen|>");
         if (pen_ast) {
-            width = m_unitConverter.convert(pen_ast->children[0]->contents);
+            width = m_unitConverter.convertTo_mm(pen_ast->children[0]->contents);
             // The pen parameter is the thickness of the pen;
             // when zero, the default pen width is used.
             if (qFuzzyIsNull(width)) {
@@ -551,8 +552,8 @@ void KicadLegacySymbolFileImport::polygonAstToSymbol(mpc_ast_t *polygon_ast, Kic
         bool hasPrev = false;
         for (int i = 0; i<points_ast->children_num; i++) {
             mpc_ast_t *point = points_ast->children[i];
-            qreal x = m_unitConverter.convert(point->children[0]->children[0]->contents);
-            qreal y = m_unitConverter.convert(point->children[1]->children[0]->contents);
+            qreal x = m_unitConverter.convertTo_mm(point->children[0]->children[0]->contents);
+            qreal y = m_unitConverter.convertTo_mm(point->children[1]->children[0]->contents);
 
             if (polygon) {
                 Vertex *vertex = new Vertex();
@@ -597,12 +598,12 @@ void KicadLegacySymbolFileImport::circleAstToSymbol(mpc_ast_t *circle_ast, Kicad
     } else {
         Circle *circle = new Circle();
         circle->setLayer(EagleLayers::Symbols);
-        circle->setX(m_unitConverter.convert(x_ast->children[0]->contents));
-        circle->setY(m_unitConverter.convert(y_ast->children[0]->contents));
-        circle->setRadius(m_unitConverter.convert(r_ast->children[0]->contents));
+        circle->setX(m_unitConverter.convertTo_mm(x_ast->children[0]->contents));
+        circle->setY(m_unitConverter.convertTo_mm(y_ast->children[0]->contents));
+        circle->setRadius(m_unitConverter.convertTo_mm(r_ast->children[0]->contents));
 
         if (pen_ast) {
-            qreal width = m_unitConverter.convert(pen_ast->children[0]->contents);
+            qreal width = m_unitConverter.convertTo_mm(pen_ast->children[0]->contents);
             // The pen parameter is the thickness of the pen;
             // when zero, the default pen width is used.
             if (qFuzzyIsNull(width))
@@ -631,7 +632,7 @@ void KicadLegacySymbolFileImport::arcAstToSymbol(mpc_ast_t *arc_ast, KicadImport
     Wire *wire = new Wire();
     wire->setLayer(EagleLayers::Symbols);
     if (pen_ast) {
-        qreal width = m_unitConverter.convert(pen_ast->children[0]->contents);
+        qreal width = m_unitConverter.convertTo_mm(pen_ast->children[0]->contents);
         // The pen parameter is the thickness of the pen;
         // when zero, the default pen width is used.
         if (qFuzzyIsNull(width))
@@ -648,15 +649,15 @@ void KicadLegacySymbolFileImport::arcAstToSymbol(mpc_ast_t *arc_ast, KicadImport
         // but the angles are swapped if there
         // (normalized) difference exceeds 180 degrees.
 
-        wire->setX2(m_unitConverter.convert(x_start_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y_start_ast->children[0]->contents));
-        wire->setX1(m_unitConverter.convert(x_end_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y_end_ast->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x_start_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y_start_ast->children[0]->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x_end_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y_end_ast->contents));
     } else {
-        wire->setX1(m_unitConverter.convert(x_start_ast->children[0]->contents));
-        wire->setY1(m_unitConverter.convert(y_start_ast->children[0]->contents));
-        wire->setX2(m_unitConverter.convert(x_end_ast->children[0]->contents));
-        wire->setY2(m_unitConverter.convert(y_end_ast->contents));
+        wire->setX1(m_unitConverter.convertTo_mm(x_start_ast->children[0]->contents));
+        wire->setY1(m_unitConverter.convertTo_mm(y_start_ast->children[0]->contents));
+        wire->setX2(m_unitConverter.convertTo_mm(x_end_ast->children[0]->contents));
+        wire->setY2(m_unitConverter.convertTo_mm(y_end_ast->contents));
     }
 
     symbol->addWire(wire);

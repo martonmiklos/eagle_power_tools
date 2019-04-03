@@ -5,13 +5,13 @@
 
 #include <QAbstractItemModel>
 
-class LibraryElementsModel : public QAbstractItemModel
+class LibraryQASelectElementsModel : public QAbstractItemModel
 {
 public:
-    LibraryElementsModel(QObject *parent = nullptr);
+    LibraryQASelectElementsModel(QObject *parent = nullptr);
 
     enum LibraryElementType {
-        Sybmol,
+        Symbol,
         Package,
         Deviceset
     };

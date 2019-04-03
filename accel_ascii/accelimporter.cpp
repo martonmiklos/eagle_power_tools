@@ -17,7 +17,7 @@ bool AccelImporter::convert()
     m_lbr = new Eagle();
 
 
-    QFile pcbFile(m_pcbPath);
+    /*QFile pcbFile(m_pcbPath);
     if (pcbFile.open(QFile::ReadOnly)) {
         auto parsetree = sexpresso::parse(pcbFile.readAll().constData());
         auto module = parsetree.getChildByPath("module");
@@ -52,7 +52,7 @@ bool AccelImporter::convert()
     }
     return lib;
     auto parsetree = sexpresso::parse(m_pcb.readAll().constData());
-    auto module = parsetree.getChildByPath("module");
+    auto module = parsetree.getChildByPath("module");*/
 }
 
 void AccelImporter::setSchs(const QStringList &schs)

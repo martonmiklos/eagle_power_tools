@@ -24,6 +24,36 @@ void LibraryQAWizard::closeEvent(QCloseEvent *event)
     // TODO free the loaded eagle design
 }
 
+void LibraryQAWizard::performChecks()
+{
+    for (LibraryQA_Check *check : LibraryQAChecksRegistry::instance()->symbolChecks()) {
+        if (check->isEnabled()) {
+            SymbolQACheck *symbolCheck = static_cast<SymbolQACheck*>(check);
+            for (Symbol *symbol : *m_library->symbols()->symbolList()) {
+                symbolCheck->checkSymbol(symbol);
+            }
+        }
+    }
+
+    for (LibraryQA_Check *check : LibraryQAChecksRegistry::instance()->packageChecks()) {
+        if (check->isEnabled()) {
+            PackageQACheck *packageCheck = static_cast<PackageQACheck*>(check);
+            for (Package *package : *m_library->packages()->packageList()) {
+                packageCheck->checkPackage(package);
+            }
+        }
+    }
+
+    for (LibraryQA_Check *check : LibraryQAChecksRegistry::instance()->deviceSetChecks()) {
+        if (check->isEnabled()) {
+            DeviceSetQACheck *dsCheck = static_cast<DeviceSetQACheck*>(check);
+            for (Deviceset *ds : *m_library->devicesets()->devicesetList()) {
+                dsCheck->checkDeviceset(ds);
+            }
+        }
+    }
+}
+
 Library *LibraryQAWizard::library() const
 {
     return m_library;
@@ -41,8 +71,7 @@ void LibraryQAWizard::currentIdChangedSlot(int id)
         m_elementsSelectPage->setLibrary(m_library);
         break;
     case LibraryQAWizard::Results:
-        break;
-    default:
+        performChecks();
         break;
     }
 }

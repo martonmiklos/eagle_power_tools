@@ -5,7 +5,6 @@
 #include <QString>
 
 // TODO get rid of these functions
-const char *emsg(void);
 char *slurp(FILE *f);
 
 class KicadUnitConverter
@@ -21,7 +20,7 @@ public:
     Mode mode() const;
     void setMode(const Mode &mode);
 
-    double convert(const QString & kicadData);
+    double convertTo_mm(const QString & kicadData);
 
 private:
     Mode m_mode;

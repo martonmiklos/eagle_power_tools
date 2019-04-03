@@ -1,33 +1,33 @@
 #include "libraryelementssmodel.h"
 
 
-LibraryElementsModel::LibraryElementsModel(QObject *parent) :
+LibraryQASelectElementsModel::LibraryQASelectElementsModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
 
 }
 
-QModelIndex LibraryElementsModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex LibraryQASelectElementsModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
     if (!parent.isValid()) {
         switch (static_cast<LibraryElementType>(row)) {
-        case LibraryElementsModel::Sybmol:
+        case LibraryQASelectElementsModel::Symbol:
             return createIndex(row, column, SymbolsGroup);
-        case LibraryElementsModel::Package:
+        case LibraryQASelectElementsModel::Package:
             return createIndex(row, column, PackagesGroup);
-        case LibraryElementsModel::Deviceset:
+        case LibraryQASelectElementsModel::Deviceset:
             return createIndex(row, column, DevicesetsGroup);
         }
     } else {
         switch (static_cast<TreeElementType>(parent.internalId())) {
-        case LibraryElementsModel::SymbolsGroup:
+        case LibraryQASelectElementsModel::SymbolsGroup:
             return createIndex(row, column, SymbolElement);
-        case LibraryElementsModel::PackagesGroup:
+        case LibraryQASelectElementsModel::PackagesGroup:
             return createIndex(row, column, PackageElement);
-        case LibraryElementsModel::DevicesetsGroup:
+        case LibraryQASelectElementsModel::DevicesetsGroup:
             return createIndex(row, column, DevicesetElement);
         default:
             return QModelIndex();
@@ -36,14 +36,14 @@ QModelIndex LibraryElementsModel::index(int row, int column, const QModelIndex &
     return QModelIndex();
 }
 
-QModelIndex LibraryElementsModel::parent(const QModelIndex &child) const
+QModelIndex LibraryQASelectElementsModel::parent(const QModelIndex &child) const
 {
     if (!child.isValid())
         return QModelIndex();
 
     switch (static_cast<TreeElementType>(child.internalId())) {
     case TreeElementType::SymbolElement:
-        return createIndex(Sybmol, 0, SymbolsGroup);
+        return createIndex(Symbol, 0, SymbolsGroup);
     case TreeElementType::PackageElement:
         return createIndex(Package, 0, PackagesGroup);
     case TreeElementType::DevicesetElement:
@@ -53,28 +53,28 @@ QModelIndex LibraryElementsModel::parent(const QModelIndex &child) const
     }
 }
 
-QVariant LibraryElementsModel::data(const QModelIndex &index, int role) const
+QVariant LibraryQASelectElementsModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole) {
         if (!index.parent().isValid()) {
             if (index.column() == ColElementName) {
                 switch (static_cast<LibraryElementType>(index.row())) {
-                case LibraryElementsModel::Sybmol:
+                case LibraryQASelectElementsModel::Symbol:
                     return tr("Symbol");
-                case LibraryElementsModel::Package:
+                case LibraryQASelectElementsModel::Package:
                     return tr("Footprint");
-                case LibraryElementsModel::Deviceset:
+                case LibraryQASelectElementsModel::Deviceset:
                     return tr("Device");
                 }
             }
         } else {
             if (index.column() == ColElementName) {
                 switch (static_cast<LibraryElementType>(index.parent().row())) {
-                case LibraryElementsModel::Sybmol:
+                case LibraryQASelectElementsModel::Symbol:
                     return m_symbols.at(index.row())->name();
-                case LibraryElementsModel::Package:
+                case LibraryQASelectElementsModel::Package:
                     return m_packages.at(index.row())->name();
-                case LibraryElementsModel::Deviceset:
+                case LibraryQASelectElementsModel::Deviceset:
                     return m_devicesets.at(index.row())->name();
                 }
             }
@@ -85,7 +85,7 @@ QVariant LibraryElementsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool LibraryElementsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool LibraryQASelectElementsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.parent().isValid()
             && index.column() == ColChecked
@@ -96,9 +96,9 @@ bool LibraryElementsModel::setData(const QModelIndex &index, const QVariant &val
     return true;
 }
 
-QVariant LibraryElementsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant LibraryQASelectElementsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
         case ColElementName:
             return tr("Element");
@@ -109,25 +109,25 @@ QVariant LibraryElementsModel::headerData(int section, Qt::Orientation orientati
     return QVariant();
 }
 
-Qt::ItemFlags LibraryElementsModel::flags(const QModelIndex &index) const
+Qt::ItemFlags LibraryQASelectElementsModel::flags(const QModelIndex &index) const
 {
     if (index.isValid() && index.column() == ColChecked) {
-        return Qt::ItemIsUserCheckable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
     }
     return Qt::ItemIsEnabled;
 }
 
-int LibraryElementsModel::rowCount(const QModelIndex &parent) const
+int LibraryQASelectElementsModel::rowCount(const QModelIndex &parent) const
 {
     if (!parent.isValid())
         return 3;
     else {
         switch (static_cast<TreeElementType>(parent.internalId())) {
-        case LibraryElementsModel::SymbolsGroup:
+        case LibraryQASelectElementsModel::SymbolsGroup:
             return  m_symbols.count();
-        case LibraryElementsModel::PackagesGroup:
+        case LibraryQASelectElementsModel::PackagesGroup:
             return m_packages.count();
-        case LibraryElementsModel::DevicesetsGroup:
+        case LibraryQASelectElementsModel::DevicesetsGroup:
             return  m_devicesets.count();
         default:
             return 0;
@@ -135,20 +135,20 @@ int LibraryElementsModel::rowCount(const QModelIndex &parent) const
     }
 }
 
-int LibraryElementsModel::columnCount(const QModelIndex &parent) const
+int LibraryQASelectElementsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
     return 2;
 }
 
-bool LibraryElementsModel::hasChildren(const QModelIndex &parent) const
+bool LibraryQASelectElementsModel::hasChildren(const QModelIndex &parent) const
 {
     if (!parent.isValid())
         return true;
     return GroupElementsBegin < parent.internalId() && parent.internalId() < GroupElementsEnd;
 }
 
-void LibraryElementsModel::setLibrary(Library *lib)
+void LibraryQASelectElementsModel::setLibrary(Library *lib)
 {
     beginResetModel();
     m_symbols.clear();

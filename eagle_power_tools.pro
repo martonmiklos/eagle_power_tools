@@ -48,7 +48,6 @@ SOURCES += \
     eaglerc/palette.cpp \
     eaglerc/eaglesettings.cpp \
     dialoggraphicsdebug.cpp \
-    library_qa/checks/checknamesandvalues.cpp \
     gerberimportfixer.cpp \
     mpc/mpc.c \
     kicad/kicadlegacyfootprintimport.cpp \
@@ -57,7 +56,7 @@ SOURCES += \
     kicad/kicadfootprintimport.cpp \
     sexpresso/sexpresso/sexpresso.cpp \
     eagle_librarysaver.cpp \
-    library_qa/symbolpingridcheck.cpp \
+    library_qa/checks/symbolpingridcheck.cpp \
     library_qa/wizard/libraryqawizardselectlibrarypage.cpp \
     library_qa/wizard/libraryqawizard.cpp \
     library_qa/wizard/libraryqaselectchecks.cpp \
@@ -69,7 +68,11 @@ SOURCES += \
     library_qa/libraryqachecksregistry.cpp \
     accel_ascii/dialogaccelasciiimport.cpp \
     accel_ascii/dialogaccelasciiimport_settings.cpp \
-    accel_ascii/accelimporter.cpp
+    accel_ascii/accelimporter.cpp \
+    library_qa/wizard/models/libraryqaresultsmodel.cpp \
+    library_qa/checks/checksymbolnamesandvalues.cpp \
+    library_qa/checks/checkpackagenamesandvalues.cpp \
+    library_qa/checks/devicesetpartprefixcheck.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -83,17 +86,15 @@ HEADERS += \
     eaglerc/palette.h \
     eaglerc/eaglesettings.h \
     dialoggraphicsdebug.h \
-    library_qa/checks/checknamesandvalues.h \
     gerberimportfixer.h \
     mpc/mpc.h \
     kicad/kicadlegacyfootprintimport.h \
     kicad/kicadimportutils.h \
     kicad/kicadlegacysymbolfileimport.h \
-    kicad/legacy_symbollib_grammar.h \
     kicad/kicadfootprintimport.h \
     sexpresso/sexpresso/sexpresso.hpp \
     eagle_librarysaver.h \
-    library_qa/symbolpingridcheck.h \
+    library_qa/checks/symbolpingridcheck.h \
     library_qa/wizard/libraryqawizardselectlibrarypage.h \
     library_qa/wizard/libraryqawizard.h \
     library_qa/wizard/libraryqaselectchecks.h \
@@ -104,7 +105,12 @@ HEADERS += \
     library_qa/libraryqacheck.h \
     library_qa/libraryqachecksregistry.h \
     accel_ascii/dialogaccelasciiimport.h \
-    accel_ascii/accelimporter.h
+    accel_ascii/accelimporter.h \
+    kicad/kicadlegacysymbolgrammar.h \
+    library_qa/wizard/models/libraryqaresultsmodel.h \
+    library_qa/checks/checksymbolnamesandvalues.h \
+    library_qa/checks/checkpackagenamesandvalues.h \
+    library_qa/checks/devicesetpartprefixcheck.h
 
 FORMS += \
         mainwindow.ui \

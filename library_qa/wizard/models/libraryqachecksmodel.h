@@ -2,24 +2,39 @@
 #define LIBRARYQACHECKSMODEL_H
 
 #include "library_qa/libraryqacheck.h"
+#include "library_qa/libraryqachecksregistry.h"
+#include "libraryelementssmodel.h"
 
 #include <QAbstractItemModel>
 
-class LibraryQAChecksModel : public QAbstractItemModel
+class LibraryQASelectChecksModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit LibraryQAChecksModel(QObject *parent = nullptr);
+    enum Columns {
+        ColCheckName,
+        ColPerformCheck
+    };
+    explicit LibraryQASelectChecksModel(QObject *parent = nullptr);
 
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex &parent) const override;
 
-signals:
+private:
+    bool m_allSymbolCheckEnabled = true;
+    bool m_allPackageCheckEnabled = true;
+    bool m_allDeviceSetCheckEnabled = true;
 
-public slots:
+    void calculateSymbolsGroupCheckState();
+    void calculatePackagesGroupCheckState();
+    void calculateGroupsCheckState();
+    void calculateDeviceSetsGroupCheckState();
 };
 
 #endif // LIBRARYQACHECKSMODEL_H

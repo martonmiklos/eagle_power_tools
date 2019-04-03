@@ -12,7 +12,7 @@ class DialogAccelAsciiImport : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogAccelAsciiImport(QWidget *parent = 0);
+    explicit DialogAccelAsciiImport(QWidget *parent = nullptr);
     ~DialogAccelAsciiImport();
 
 private slots:
@@ -21,7 +21,7 @@ private slots:
 private:
     Ui::DialogAccelAsciiImport *ui;
     void loadWidgets();
-    void saveWidgets();
+    void saveWidgets() const;
 };
 
 #endif // DIALOGACCELASCIIIMPORT_H

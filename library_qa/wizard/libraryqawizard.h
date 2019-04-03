@@ -32,8 +32,9 @@ private:
     LibraryQASelectChecks *m_checksSelectPage = nullptr;
     LibraryQASelectComponents *m_elementsSelectPage = nullptr;
     LibraryQAResults *m_resultsPage = nullptr;
-
     Library *m_library = nullptr;
+    void performChecks();
+
 private slots:
     void currentIdChangedSlot(int id);
 };

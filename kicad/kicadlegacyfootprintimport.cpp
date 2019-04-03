@@ -236,7 +236,7 @@ mpc_ast_t *KicadLegacyFootprintLibImporter::parseModfileToAst(const char *file_n
 }
 
 
-Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPath)
+Library* KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPath)
 {
     m_libPath = libraryPath;
 
@@ -245,8 +245,6 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
     char *istring = nullptr;
 
     Library *lib = new Library();
-    //lib->symbols().symbolList()
-
     if(!handle)
         return nullptr;
 
@@ -262,29 +260,6 @@ Library * KicadLegacyFootprintLibImporter::parseModFile(const QString &libraryPa
     if (units_ast) {
         m_unitConverter.setMode(KicadUnitConverter::Mm);
     }
-
-    // FIXME remove this and let the symbol importer handle it
-    /*Symbols *symbols = new Symbols();
-    mpc_ast_t *symbols_ast = mpc_ast_get_child_lb(ast, "symbolnames|>", 0);
-    if (symbols_ast) {
-        for(int i = 0; i >= 0;) {
-            i = mpc_ast_get_index_lb(symbols_ast, "symbolname|>", i);
-            if (i >= 0) {
-                mpc_ast_t *symbol_ast = mpc_ast_get_child_lb(symbols_ast, "symbolname|>", i);
-                if (symbol_ast) {
-                    mpc_ast_t *symbolname_ast = mpc_ast_get_child_lb(symbol_ast, "nonquoted_string|regex", 0);
-                    if (symbolname_ast) {
-                        qWarning() << symbolname_ast->contents;
-                        Symbol *sym = new Symbol();
-                        sym->setName(symbolname_ast->contents);
-                        //symbols->addSymbol(sym);
-                    }
-                }
-                i++;
-            }
-        }
-    }
-    lib->setSymbols(symbols);*/
 
     Packages *packages = new Packages();
     for(int i = 0; i >= 0;) {
@@ -339,8 +314,8 @@ Package *KicadLegacyFootprintLibImporter::parseModuleAstToPackage(mpc_ast_t *mod
         Text *refdestext = new Text();
         mpc_ast_t *x_ast = mpc_ast_get_child_lb(refdestext_ast, "x|>", 0);
         mpc_ast_t *y_ast = mpc_ast_get_child_lb(refdestext_ast, "y|>", 0);
-        refdestext->setX(m_unitConverter.convert(x_ast->children[0]->contents));
-        refdestext->setY(-m_unitConverter.convert(y_ast->children[0]->contents));
+        refdestext->setX(m_unitConverter.convertTo_mm(x_ast->children[0]->contents));
+        refdestext->setY(-m_unitConverter.convertTo_mm(y_ast->children[0]->contents));
 
         mpc_ast_t *angle_ast = mpc_ast_get_child_lb(refdestext_ast, "angle|>", 0);
         if (angle_ast) {
@@ -358,7 +333,7 @@ Package *KicadLegacyFootprintLibImporter::parseModuleAstToPackage(mpc_ast_t *mod
 
         mpc_ast_t *height_ast = mpc_ast_get_child_lb(refdestext_ast, "height|>", 0);
         if (height_ast) {
-            refdestext->setSize(m_unitConverter.convert(height_ast->children[0]->contents));
+            refdestext->setSize(m_unitConverter.convertTo_mm(height_ast->children[0]->contents));
         }
 
         refdestext->setAlign(Text::Align_center);
@@ -372,8 +347,8 @@ Package *KicadLegacyFootprintLibImporter::parseModuleAstToPackage(mpc_ast_t *mod
         Text *valuetext = new Text();
         mpc_ast_t *x_ast = mpc_ast_get_child_lb(valuetext_ast, "x|>", 0);
         mpc_ast_t *y_ast = mpc_ast_get_child_lb(valuetext_ast, "y|>", 0);
-        valuetext->setX(m_unitConverter.convert(x_ast->children[0]->contents));
-        valuetext->setY(-m_unitConverter.convert(y_ast->children[0]->contents));
+        valuetext->setX(m_unitConverter.convertTo_mm(x_ast->children[0]->contents));
+        valuetext->setY(-m_unitConverter.convertTo_mm(y_ast->children[0]->contents));
 
         mpc_ast_t *angle_ast = mpc_ast_get_child_lb(valuetext_ast, "angle|>", 0);
         if (angle_ast) {
@@ -394,7 +369,7 @@ Package *KicadLegacyFootprintLibImporter::parseModuleAstToPackage(mpc_ast_t *mod
 
         mpc_ast_t *height_ast = mpc_ast_get_child_lb(valuetext_ast, "height|>", 0);
         if (height_ast) {
-            valuetext->setSize(m_unitConverter.convert(height_ast->children[0]->contents));
+            valuetext->setSize(m_unitConverter.convertTo_mm(height_ast->children[0]->contents));
         }
         package->addText(valuetext);
     }
@@ -426,16 +401,16 @@ void KicadLegacyFootprintLibImporter::parseLinesAstToPackage(mpc_ast_t *lines_as
                     Wire *line = new Wire();
                     mpc_ast_t *x1_ast = mpc_ast_get_child_lb(line_ast, "x1|>", 0);
                     mpc_ast_t *y1_ast = mpc_ast_get_child_lb(line_ast, "y1|>", 0);
-                    line->setX1(m_unitConverter.convert(x1_ast->children[0]->contents));
-                    line->setY1(-m_unitConverter.convert(y1_ast->children[0]->contents));
+                    line->setX1(m_unitConverter.convertTo_mm(x1_ast->children[0]->contents));
+                    line->setY1(-m_unitConverter.convertTo_mm(y1_ast->children[0]->contents));
 
                     mpc_ast_t *x2_ast = mpc_ast_get_child_lb(line_ast, "x2|>", 0);
                     mpc_ast_t *y2_ast = mpc_ast_get_child_lb(line_ast, "y2|>", 0);
-                    line->setX2(m_unitConverter.convert(x2_ast->children[0]->contents));
-                    line->setY2(-m_unitConverter.convert(y2_ast->children[0]->contents));
+                    line->setX2(m_unitConverter.convertTo_mm(x2_ast->children[0]->contents));
+                    line->setY2(-m_unitConverter.convertTo_mm(y2_ast->children[0]->contents));
 
                     mpc_ast_t *pen_ast = mpc_ast_get_child_lb(line_ast, "pen|>", 0);
-                    line->setWidth(m_unitConverter.convert(pen_ast->children[0]->contents));
+                    line->setWidth(m_unitConverter.convertTo_mm(pen_ast->children[0]->contents));
 
                     mpc_ast_t *layer_ast = mpc_ast_get_child_lb(line_ast, "layer|integer|regex", 0);
                     if (layer_ast)
@@ -467,15 +442,15 @@ void KicadLegacyFootprintLibImporter::parsePadsAstToPackage(mpc_ast_t *pads_ast,
                     double w = 0.0, h = 0.0;
                     if (padname_ast) {
                         name = QString(padname_ast->children[2]->children[0]->children[1]->contents);
-                        w = m_unitConverter.convert(padname_ast->children[4]->children[0]->contents);
-                        h = m_unitConverter.convert(padname_ast->children[5]->children[0]->contents);
+                        w = m_unitConverter.convertTo_mm(padname_ast->children[4]->children[0]->contents);
+                        h = m_unitConverter.convertTo_mm(padname_ast->children[5]->children[0]->contents);
                     }
 
                     mpc_ast_t *padpos_ast = mpc_ast_get_child_lb(pad_ast, "padpos|>", 0);
                     double x = 0, y = 0;
                     if (padpos_ast) {
-                        x = m_unitConverter.convert(padpos_ast->children[2]->children[0]->contents);
-                        y = -m_unitConverter.convert(padpos_ast->children[3]->contents);
+                        x = m_unitConverter.convertTo_mm(padpos_ast->children[2]->children[0]->contents);
+                        y = -m_unitConverter.convertTo_mm(padpos_ast->children[3]->contents);
                     }
 
                     mpc_ast_t *padtype_ast = mpc_ast_get_child_lb(pad_ast, "padtype|>", 0);

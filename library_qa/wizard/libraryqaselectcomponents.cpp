@@ -8,7 +8,7 @@ LibraryQASelectComponents::LibraryQASelectComponents(QWidget *parent) :
     ui->setupUi(this);
     this->setTitle(tr("Select the items to check"));
 
-    m_model = new LibraryElementsModel(this);
+    m_model = new LibraryQASelectElementsModel(this);
 }
 
 LibraryQASelectComponents::~LibraryQASelectComponents()
@@ -20,6 +20,6 @@ void LibraryQASelectComponents::setLibrary(Library *lib)
 {
     m_model->setLibrary(lib);
     ui->treeViewComponentsToCheck->setModel(m_model);
-    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryElementsModel::ColElementName, QHeaderView::Stretch);
-    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryElementsModel::ColChecked, QHeaderView::ResizeToContents);
+    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryQASelectElementsModel::ColElementName, QHeaderView::Stretch);
+    ui->treeViewComponentsToCheck->header()->setSectionResizeMode(LibraryQASelectElementsModel::ColChecked, QHeaderView::ResizeToContents);
 }

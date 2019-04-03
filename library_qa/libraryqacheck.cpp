@@ -11,18 +11,55 @@ LibraryQA_Check::LibraryQA_Check(const QString &name) :
 
 }
 
+void LibraryQA_Check::fix()
+{
+    for (auto *r : m_results) {
+        r->fix();
+    }
+}
+
 QString LibraryQA_Check::name() const
 {
     return m_name;
 }
 
+void LibraryQA_Check::reset()
+{
+    qDeleteAll(m_results);
+}
+
+int LibraryQA_Check::resultCount() const
+{
+    return m_results.count();
+}
+
+bool LibraryQA_Check::isEnabled() const
+{
+    return m_enabled;
+}
+
+void LibraryQA_Check::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
+}
+
+QString LibraryQA_Check::code() const
+{
+    return m_code;
+}
+
 LibraryQA_Check::~LibraryQA_Check()
 {
-    
+    reset();
 }
 
 
 LibraryQA_StepResult::LibraryQA_StepResult()
+{
+
+}
+
+LibraryQA_StepResult::~LibraryQA_StepResult()
 {
 
 }

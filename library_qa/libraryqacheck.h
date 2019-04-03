@@ -8,6 +8,7 @@ class LibraryQA_StepResult
 {
 public:
     LibraryQA_StepResult();
+    virtual ~LibraryQA_StepResult();
 
     /**
      * @brief The Severity enum
@@ -35,6 +36,10 @@ public:
     bool highlight() const;
     void setHighlight(bool highlight);
 
+    virtual void fix() = 0;
+
+    virtual bool fixable() const = 0;
+
 private:
     Severity m_severity = Error;
     QString m_shortDescription, m_longDescription;
@@ -46,7 +51,7 @@ class LibraryQA_Check
 public:
     LibraryQA_Check();
     LibraryQA_Check(const QString & name);
-    virtual ~LibraryQA_Check() = 0;
+    virtual ~LibraryQA_Check();
 
     enum CheckTarget {
         CheckTarget_Symbol,
@@ -54,21 +59,52 @@ public:
         CheckTarget_Deviceset
     };
 
-    virtual bool checkPackage(Package *package) = 0;
-    virtual bool checkSymbol(Symbol *symbol) = 0;
-    virtual bool checkDeviceset(Deviceset *ds) = 0;
+    void fix();
 
-    virtual bool fixPackage(Package *package, LibraryQA_StepResult *result) = 0;
-    virtual bool fixSymbol(Symbol *symbol, LibraryQA_StepResult *result) = 0;
-    virtual bool fixDeviceset(Deviceset *ds, LibraryQA_StepResult *result) = 0;
-
-    virtual QList<CheckTarget> targets() const = 0;
-
+    virtual CheckTarget target() const = 0;
 
     QString name() const;
+    void reset();
+
+    int resultCount() const;
+
+    bool isEnabled() const;
+    void setEnabled(bool isEnabled);
+
+    QString code() const;
 
 protected:
     QString m_name;
+    QString m_code;
+    QList<LibraryQA_StepResult*> m_results;
+    bool m_enabled = false;
+};
+
+class SymbolQACheck : public LibraryQA_Check
+{
+public:
+    SymbolQACheck() : LibraryQA_Check() {}
+    SymbolQACheck(const QString& name) : LibraryQA_Check(name) {}
+    CheckTarget target() const {return  CheckTarget_Symbol;}
+    virtual bool checkSymbol(Symbol *symbol) = 0;
+};
+
+class PackageQACheck : public LibraryQA_Check
+{
+public:
+    PackageQACheck() : LibraryQA_Check() {}
+    PackageQACheck(const QString& name) : LibraryQA_Check(name) {}
+    CheckTarget target() const {return  CheckTarget_Package;}
+    virtual bool checkPackage(Package *package) = 0;
+};
+
+class DeviceSetQACheck : public LibraryQA_Check
+{
+public:
+    DeviceSetQACheck() : LibraryQA_Check() {}
+    DeviceSetQACheck(const QString& name) : LibraryQA_Check(name) {}
+    CheckTarget target() const {return  CheckTarget_Deviceset;}
+    virtual bool checkDeviceset(Deviceset *ds) = 0;
 };
 
 #endif // LIBRARYQA_STEP_H

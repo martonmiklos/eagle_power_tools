@@ -19,7 +19,7 @@ public:
     void setLibrary(Library *lib);
 private:
     Ui::LibraryQASelectComponents *ui;
-    LibraryElementsModel *m_model = nullptr;
+    LibraryQASelectElementsModel *m_model = nullptr;
 };
 
 #endif // LIBRARYQASELECTCOMPONENTS_H
