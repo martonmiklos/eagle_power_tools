@@ -69,7 +69,12 @@ SOURCES += \
     library_qa/libraryqachecksregistry.cpp \
     accel_ascii/dialogaccelasciiimport.cpp \
     accel_ascii/dialogaccelasciiimport_settings.cpp \
-    accel_ascii/accelimporter.cpp
+    accel_ascii/accelimporter.cpp \
+    lasercut/stencillasercutsvgexport.cpp \
+    lasercut/lasercutstencilexportwizard.cpp \
+    lasercut/wizardpages/lasercutintropage.cpp \
+    lasercut/wizardpages/lasercutoutputpage.cpp \
+    lasercut/wizardpages/lasercutinputpage.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -104,7 +109,12 @@ HEADERS += \
     library_qa/libraryqacheck.h \
     library_qa/libraryqachecksregistry.h \
     accel_ascii/dialogaccelasciiimport.h \
-    accel_ascii/accelimporter.h
+    accel_ascii/accelimporter.h \
+    lasercut/stencillasercutsvgexport.h \
+    lasercut/lasercutstencilexportwizard.h \
+    lasercut/wizardpages/lasercutintropage.h \
+    lasercut/wizardpages/lasercutoutputpage.h \
+    lasercut/wizardpages/lasercutinputpage.h
 
 FORMS += \
         mainwindow.ui \
@@ -114,7 +124,10 @@ FORMS += \
     library_qa/wizard/libraryqaselectchecks.ui \
     library_qa/wizard/libraryqaselectcomponents.ui \
     library_qa/wizard/libraryqaresults.ui \
-    accel_ascii/dialogaccelasciiimport.ui
+    accel_ascii/dialogaccelasciiimport.ui \
+    lasercut/wizardpages/lasercutintropage.ui \
+    lasercut/wizardpages/lasercutoutputpage.ui \
+    lasercut/wizardpages/lasercutinputpage.ui
 
 RESOURCES += \
     res/resources.qrc

@@ -6,6 +6,7 @@
 #include "accel_ascii/dialogaccelasciiimport.h"
 #include "dialogsettings.h"
 #include "druloader.h"
+#include "lasercut/lasercutstencilexportwizard.h"
 #include "library_qa/wizard/libraryqawizard.h"
 
 #include <QCloseEvent>
@@ -34,6 +35,7 @@ private slots:
     void on_actionGerber_import_fix_triggered();
     void on_actionConvert_Kicad_library_triggered();
     void on_actionImport_Accel_ascii_triggered();
+    void on_actionGenerate_lasercut_stencils_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -41,6 +43,7 @@ private:
     DialogAccelAsciiImport *m_accelImportDialog = nullptr;
     DRULoader *m_dru;
     LibraryQAWizard *m_libQAWizard = nullptr;
+    LaserCutStencilExportWizard *m_laserCutWizard = nullptr;
 };
 
 #endif // MAINWINDOW_H

@@ -110,9 +110,9 @@ void MainWindow::on_actionGerber_import_fix_triggered()
 void MainWindow::on_actionConvert_Kicad_library_triggered()
 {
     QString lastKicadLibFile = QFileDialog::getOpenFileName(this,
-                                                         tr("Select Kicad library"),
-                                                         m_settings.value("lastKicadLibFile", QDir::homePath()).toString(),
-                                                         tr("Kicad library files (*.mod)"));
+                                                            tr("Select Kicad library"),
+                                                            m_settings.value("lastKicadLibFile", QDir::homePath()).toString(),
+                                                            tr("Kicad library files (*.mod)"));
     if (!lastKicadLibFile.isEmpty()) {
         KicadLegacyFootprintLibImporter importer;
         importer.parseModFile("/tmp/AA01B-S040VA1.mod");
@@ -126,4 +126,27 @@ void MainWindow::on_actionImport_Accel_ascii_triggered()
         m_accelImportDialog = new DialogAccelAsciiImport(this);
     }
     m_accelImportDialog->show();
+}
+
+void MainWindow::on_actionGenerate_lasercut_stencils_triggered()
+{
+    if (m_laserCutWizard == nullptr)
+        m_laserCutWizard = new LaserCutStencilExportWizard(this);
+    m_laserCutWizard->show();
+    /*m_settings.beginGroup("laserCut");
+    QString brdPath = QFileDialog::getOpenFileName(this,
+                                                   tr("Select Brd file"),
+                                                   m_settings.value("lastSoruceFile").toString(),
+                                                   tr("EAGLE Brd files (*.brd)"));
+    if (!brdPath.isEmpty()) {
+        QString svgPath = QFileDialog::getSaveFileName(this,
+                                                       tr("Select the SVG file to save"),
+                                                       m_settings.value("lastOutputFile", QDir::homePath()).toString(),
+                                                       tr("SVG files (*.svg)"));
+        if (svgPath.isEmpty()) {
+            m_settings.setValue("lastSoruceFile", brdPath);
+            m_settings.setValue("lastOutputFile", svgPath);
+        }
+    }
+    m_settings.endGroup();*/
 }
