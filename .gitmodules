@@ -10,3 +10,9 @@
 [submodule "sexpresso"]
 	path = sexpresso
 	url = https://github.com/BitPuffin/sexpresso.git
+[submodule "vendor/de/skycoder42/qpathedit"]
+	path = vendor/de/skycoder42/qpathedit
+	url = git@github.com:Skycoder42/QPathEdit.git
+[submodule "vendor/de/skycoder42/dialog-master"]
+	path = vendor/de/skycoder42/dialog-master
+	url = https://github.com/Skycoder42/DialogMaster.git

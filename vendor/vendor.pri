@@ -5,5 +5,5 @@ INCLUDEPATH += $$PWD
 QML_IMPORT_PATH += $$PWD
 
 
-include($$PWD/de/skycoder42/dialog-master/de_skycoder42_dialog-master.pri)
+include($$PWD/de/skycoder42/dialog-master/dialogmaster.pri)
 include($$PWD/de/skycoder42/qpathedit/qpathedit.pri)
