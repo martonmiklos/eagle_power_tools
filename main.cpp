@@ -6,6 +6,8 @@
 #include "kicad/kicadlegacyfootprintimport.h"
 #include "kicad/kicadlegacysymbolfileimport.h"
 
+#include "lasercut/stencillasercutsvgexport.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName("MM");
@@ -24,6 +26,12 @@ int main(int argc, char *argv[])
     KicadLegacySymbolFileImport importer;
     importer.parseSymbolLibFile("/home/mm/symbol.lib", lib);
     EAGLE_LibrarySaver::saveLibrary(lib, "/tmp/foo.lbr");
+    return 0;*/
+
+    /*bool ok = false;
+    Eagle *brd = Eagle::parseFile("/home/mm/Projektek/eagle/ble_terrain_twister/ble_terrain_twister.brd", &ok);
+    StencilLaserCutSVGExport se;
+    se.generateSVG(EagleLayers::bCream, brd->drawing()->board(), "", "/tmp/foo.svg");
     return 0;*/
     QApplication a(argc, argv);
     MainWindow w;

@@ -26,8 +26,8 @@ void LaserCutStencilExportWizard::currentIdChangedSlot()
     if (currentId() == lastPage) {
         StencilLaserCutSVGExport exporter;
         if (m_outputPage->generateTop())
-            exporter.generateSVG(m_inputPage->brd()->drawing()->board(), m_inputPage->selectedVariant(), m_outputPage->topPath());
+            exporter.generateSVG(EagleLayers::tCream, m_inputPage->brd()->drawing()->board(), m_inputPage->selectedVariant(), m_outputPage->topPath());
         if (m_outputPage->generateBottom())
-            exporter.generateSVG(m_inputPage->brd()->drawing()->board(), m_inputPage->selectedVariant(), m_outputPage->bottomPath());
+            exporter.generateSVG(EagleLayers::bCream, m_inputPage->brd()->drawing()->board(), m_inputPage->selectedVariant(), m_outputPage->bottomPath());
     }
 }
