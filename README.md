@@ -11,6 +11,7 @@ WIP (work in progress) features:
    * Connecting the overlapping wire segments to a single net
    * Autplacing vias where acceptible
  * Converting Kicad libraries
+ * Generating stencil (t/bCream) SVG files from boards to be sent to K40 lasercutter
  
 Planned features:
  * Quality assurance for libraries

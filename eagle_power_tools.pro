@@ -4,9 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-QT += widgets
+QT       += core gui widgets svg
 
 TARGET = eagle_power_tools
 TEMPLATE = app
@@ -77,7 +75,8 @@ SOURCES += \
     lasercut/lasercutstencilexportwizard.cpp \
     lasercut/wizardpages/lasercutintropage.cpp \
     lasercut/wizardpages/lasercutoutputpage.cpp \
-    lasercut/wizardpages/lasercutinputpage.cpp
+    lasercut/wizardpages/lasercutinputpage.cpp \
+    lasercut/wizardpages/lasercutfinishpage.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -120,7 +119,8 @@ HEADERS += \
     lasercut/lasercutstencilexportwizard.h \
     lasercut/wizardpages/lasercutintropage.h \
     lasercut/wizardpages/lasercutoutputpage.h \
-    lasercut/wizardpages/lasercutinputpage.h
+    lasercut/wizardpages/lasercutinputpage.h \
+    lasercut/wizardpages/lasercutfinishpage.h
 
 FORMS += \
         mainwindow.ui \
@@ -133,7 +133,8 @@ FORMS += \
     accel_ascii/dialogaccelasciiimport.ui \
     lasercut/wizardpages/lasercutintropage.ui \
     lasercut/wizardpages/lasercutoutputpage.ui \
-    lasercut/wizardpages/lasercutinputpage.ui
+    lasercut/wizardpages/lasercutinputpage.ui \
+    lasercut/wizardpages/lasercutfinishpage.ui
 
 RESOURCES += \
     res/resources.qrc

@@ -14,6 +14,25 @@
    <string>WizardPage</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Brd file:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPathEdit" name="patheditBrdFile">
+     <property name="allowEmptyPath">
+      <bool>false</bool>
+     </property>
+     <property name="nameFilters">
+      <stringlist>
+       <string>EAGLE brd files (*.brd)</string>
+      </stringlist>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -27,15 +46,15 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
+   <item row="2" column="1">
+    <widget class="QComboBox" name="comboBoxBoardVariant"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Brd file:</string>
+      <string>Variant:</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPathEdit" name="patheditBrdFile"/>
    </item>
   </layout>
  </widget>

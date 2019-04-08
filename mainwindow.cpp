@@ -132,6 +132,7 @@ void MainWindow::on_actionGenerate_lasercut_stencils_triggered()
 {
     if (m_laserCutWizard == nullptr)
         m_laserCutWizard = new LaserCutStencilExportWizard(this);
+    m_laserCutWizard->restart();
     m_laserCutWizard->show();
     /*m_settings.beginGroup("laserCut");
     QString brdPath = QFileDialog::getOpenFileName(this,

@@ -12,7 +12,7 @@ class LaserCutIntroPage : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit LaserCutIntroPage(QWidget *parent = 0);
+    explicit LaserCutIntroPage(QWidget *parent = nullptr);
     ~LaserCutIntroPage();
 
 private:
