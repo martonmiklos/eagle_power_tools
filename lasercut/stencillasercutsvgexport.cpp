@@ -14,19 +14,25 @@ StencilLaserCutSVGExport::StencilLaserCutSVGExport()
 
 }
 
-bool StencilLaserCutSVGExport::generateSVG(Board *brd, const QString &variant, const QString &svgPath)
+bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Board *brd, const QString &variant, const QString &svgPath)
 {
     QSvgGenerator generator;
     generator.setFileName(svgPath);
-    generator.setResolution(1000); // set 1000 DPI
+    generator.setDescription(QObject::tr("Stencil SVG file generated from the %1 variant").arg(variant));
+    generator.setTitle(QObject::tr("Stencil SVG file generated from the %1 variant").arg(variant));
+    // painter paints in 1/32000 mm units
+    generator.setResolution(812800);
 
     QRectF boardRect = EAGLE_Utils::boardBoundingRect(brd);
+    generator.setViewBox(boardRect);
     generator.setSize(QSize(UnitUtilities::mmToU(boardRect.width()),
                       UnitUtilities::mmToU(boardRect.height())));
 
     QPainter painter(&generator);
+    painter.setBrush(QBrush(Qt::black));
+    painter.setPen(QPen(Qt::black, 0));
     for (Element *element : *brd->elements()->elementList()) {
-        bool add = true;
+        bool add = true;        
         if (!variant.isEmpty()) {
             for (Variant *v : *element->variantList()) {
                 if (v->name() == variant) {
@@ -42,8 +48,13 @@ bool StencilLaserCutSVGExport::generateSVG(Board *brd, const QString &variant, c
                 if (lib->name() == element->library()) {
                     for (Package* pkg : *lib->packages()->packageList()) {
                         if (pkg->name() == element->package()) {
+                            EagleLayers::PCBLayers exportLayer = layer;
+                            bool mirror = false;
+                            qreal rotation = EAGLE_Utils::rotationToDegrees(element->rot(), &mirror);
+                            if (mirror)
+                                exportLayer = EagleLayers::oppositeLayer(exportLayer);
                             pkgFound = true;
-                            paintPads(&painter, pkg);
+                            paintPads(QPointF(element->x(), element->y()), rotation, exportLayer, &painter, pkg);
                             break;
                         }
                     }
@@ -58,9 +69,18 @@ bool StencilLaserCutSVGExport::generateSVG(Board *brd, const QString &variant, c
     return true;
 }
 
-void StencilLaserCutSVGExport::paintPads(QPainter *painter, Package *package)
+void StencilLaserCutSVGExport::paintPads(const QPointF pos, qreal rotation, EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
 {
+    EagleLayers::PCBLayers activeLayer = layer == EagleLayers::tCream ? EagleLayers::Top : EagleLayers::Bottom;
+    EagleLayers::PCBLayers oppositeLayer = EagleLayers::oppositeLayer(activeLayer);
+    painter->translate(pos.x(), pos.y());
+    painter->rotate(rotation);
     for (Smd* smd : *package->smdList()) {
-        SmdPainter::drawCream(painter, smd);
+        if ((!smd->rot().contains('M') && smd->layer() == activeLayer)
+                || (smd->rot().contains('M') && smd->layer() == oppositeLayer)) {
+            SmdPainter::drawCream(painter, smd);
+        }
     }
+    painter->rotate(-rotation);
+    painter->translate(-pos.x(), -pos.y());
 }
