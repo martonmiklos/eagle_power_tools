@@ -14,12 +14,12 @@ StencilLaserCutSVGExport::StencilLaserCutSVGExport()
 
 }
 
-bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Board *brd, const QString &variant, const QString &svgPath)
+bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Schematic *sch, Board *brd, const QString &selectedVariant, const QString &svgPath)
 {
     QSvgGenerator generator;
     generator.setFileName(svgPath);
-    generator.setDescription(QObject::tr("Stencil SVG file generated from the %1 variant").arg(variant));
-    generator.setTitle(QObject::tr("Stencil SVG file generated from the %1 variant").arg(variant));
+    generator.setDescription(QObject::tr("Stencil SVG file generated from the %1 variant").arg(selectedVariant));
+    generator.setTitle(QObject::tr("Stencil SVG file generated from the %1 variant").arg(selectedVariant));
     // painter paints in 1/32000 mm units
     generator.setResolution(812800);
 
@@ -33,10 +33,15 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Board *
     painter.setPen(QPen(Qt::black, 0));
     for (Element *element : *brd->elements()->elementList()) {
         bool add = true;        
-        if (!variant.isEmpty()) {
-            for (Variant *v : *element->variantList()) {
-                if (v->name() == variant) {
-                    add = (v->populate() != Variant::Populate_no);
+        if (!selectedVariant.isEmpty()) {
+            for (Part *part : *sch->parts()->partList()) {
+                if (part->name() == element->name()) {
+                    for (Variant *var : *part->variantList()) {
+                        if (var->name() == selectedVariant) {
+                            add = (var->populate() != Variant::Populate_no);
+                            break;
+                        }
+                    }
                     break;
                 }
             }

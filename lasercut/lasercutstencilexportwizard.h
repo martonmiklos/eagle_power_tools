@@ -23,7 +23,8 @@ private:
     LaserCutOutputPage *m_outputPage;
     LaserCutFinishPage *m_finishPage;
 
-    int lastPage = -1;
+    int m_lastPageId = -10;
+    int m_inputPageId = -10;
 
 private slots:
     void currentIdChangedSlot();

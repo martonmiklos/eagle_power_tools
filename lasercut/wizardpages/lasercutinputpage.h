@@ -18,16 +18,22 @@ public:
     explicit LaserCutInputpage(QSettings *settings, QWidget *parent = nullptr);
     ~LaserCutInputpage();
 
+    void loadSettings();
+
     QString selectedVariant() const;
     Eagle *brd() const;
+    Eagle *sch() const;
 
 private slots:
     void on_patheditBrdFile_pathChanged(const QString &path);
+    void on_patheditSchematicFile_pathChanged(const QString &path);
 
 private:
+
     Ui::LaserCutInputpage *ui;
     QSettings *m_settings;
     Eagle *m_brd = nullptr;
+    Eagle *m_sch = nullptr;
 };
 
 #endif // LASERCUTINPUTPAGE_H

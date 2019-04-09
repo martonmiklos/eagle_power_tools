@@ -11,7 +11,7 @@ class StencilLaserCutSVGExport
 public:
     StencilLaserCutSVGExport();
 
-    bool generateSVG(EagleLayers::PCBLayers layer, Board *brd, const QString& variant, const QString& svgPath);
+    bool generateSVG(EagleLayers::PCBLayers layer, Schematic *sch, Board *brd, const QString& variant, const QString& svgPath);
 private:
     void drawPads(const EagleLayers::PCBLayers layer,
                    QPainter* painter,
