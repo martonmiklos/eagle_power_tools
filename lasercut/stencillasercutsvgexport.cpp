@@ -50,14 +50,23 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Board *
                         if (pkg->name() == element->package()) {
                             EagleLayers::PCBLayers exportLayer = layer;
                             bool mirror = false;
-                            qreal rotation = EAGLE_Utils::rotationToDegrees(element->rot(), &mirror);
+                            float rotation = EAGLE_Utils::rotationToDegrees(element->rot(), &mirror);
                             if (mirror)
                                 exportLayer = EagleLayers::oppositeLayer(exportLayer);
                             pkgFound = true;
-                            paintPads(QPointF(element->x(), element->y()), rotation, exportLayer, &painter, pkg);
+
+                            painter.translate(element->x(), element->y());
+                            painter.rotate(rotation);
+                            drawPads(exportLayer, &painter, pkg);
+                            drawPolygons(exportLayer, &painter, pkg);
+                            drawRects(exportLayer, &painter, pkg);
+
+                            painter.rotate(-rotation);
+                            painter.translate(-element->x(), -element->y());
                             break;
                         }
                     }
+
                     break;
                 }
             }
@@ -69,18 +78,49 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Board *
     return true;
 }
 
-void StencilLaserCutSVGExport::paintPads(const QPointF pos, qreal rotation, EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+
+void StencilLaserCutSVGExport::drawPads(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
 {
     EagleLayers::PCBLayers activeLayer = layer == EagleLayers::tCream ? EagleLayers::Top : EagleLayers::Bottom;
     EagleLayers::PCBLayers oppositeLayer = EagleLayers::oppositeLayer(activeLayer);
-    painter->translate(pos.x(), pos.y());
-    painter->rotate(rotation);
     for (Smd* smd : *package->smdList()) {
         if ((!smd->rot().contains('M') && smd->layer() == activeLayer)
                 || (smd->rot().contains('M') && smd->layer() == oppositeLayer)) {
             SmdPainter::drawCream(painter, smd);
         }
     }
-    painter->rotate(-rotation);
-    painter->translate(-pos.x(), -pos.y());
+}
+
+void StencilLaserCutSVGExport::drawPolygons(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+{
+    for (Polygon *polygon : *package->polygonList()) {
+        if (polygon->layer() == layer) {
+            QPainterPath pp;
+            for (Vertex *v : *polygon->vertexList()) {
+                if (pp.isEmpty()) {
+                    pp.moveTo(v->x(), v->y());
+                } else {
+                    if (v->curve() == 0.0) {
+                        pp.lineTo(v->x(), v->y());
+                    } else {
+                        //pp.arcTo();
+                        // FIXME
+                    }
+                }
+            }
+            painter->drawPath(pp);
+        }
+    }
+}
+
+void StencilLaserCutSVGExport::drawRects(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+{
+    for (Rectangle *rect : *package->rectangleList()) {
+        if (rect->layer() == layer) {
+            painter->drawRect(QRectF(rect->x1(),
+                                      rect->y1(),
+                                      rect->x2() - rect->x1(),
+                                      rect->y2() - rect->y1()));
+        }
+    }
 }

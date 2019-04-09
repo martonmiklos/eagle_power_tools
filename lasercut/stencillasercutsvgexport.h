@@ -13,7 +13,15 @@ public:
 
     bool generateSVG(EagleLayers::PCBLayers layer, Board *brd, const QString& variant, const QString& svgPath);
 private:
-    void paintPads(const QPointF pos, qreal rotation, EagleLayers::PCBLayers layer, QPainter* painter, Package *package);
+    void drawPads(const EagleLayers::PCBLayers layer,
+                   QPainter* painter,
+                   Package *package);
+    void drawPolygons(const EagleLayers::PCBLayers layer,
+                       QPainter* painter,
+                       Package* package);
+    void drawRects(const EagleLayers::PCBLayers layer,
+                       QPainter* painter,
+                       Package* package);
 };
 
 #endif // STENCILLASERCUTSVGEXPORT_H
