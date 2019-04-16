@@ -1,5 +1,6 @@
 #include "checksymbolnamesandvalues.h"
 
+#include "qt_eagle_xml_parser/eaglelayers.h"
 
 CheckSymbolNamesAndValues::CheckSymbolNamesAndValues() :
     SymbolQACheck (QObject::tr("Check name and value labels of the schematic symbols"))
@@ -14,17 +15,15 @@ bool CheckSymbolNamesAndValues::checkSymbol(Symbol *sym)
     Text *nameText = nullptr;
     Text *valueText = nullptr;
     for (Text *text : *sym->textList()) {
-        // FIXME hardcoded tNames layer
         if (m_checkNames && text->value() == ">NAME") {
-            if (text->layer() == 25)
+            if (text->layer() == EagleLayers::tNames)
                 hasName = true;
             else
                 nameText = text;
         }
 
-        // FIXME hardcoded tValues layer
         if (m_checkValues && text->value() == ">VALUE") {
-            if (text->layer() == 27)
+            if (text->layer() == EagleLayers::tValues)
                 hasValue = true;
             else
                 valueText = text;
@@ -40,20 +39,35 @@ bool CheckSymbolNamesAndValues::checkSymbol(Symbol *sym)
                         sym,
                         CheckSymbolNamesAndValuesResult::Name,
                         nameText);
+            res->setShortDescription(
+                        QObject::tr(">NAME label is on wrong layer in the %1 symbol")
+                        .arg(sym->name()));
+            res->setLongDescription(
+                        QObject::tr("The >NAME label is on the %1 layer in the %2 symbol " \
+                                    "however it should be on the tNames (25) layer")
+                        .arg(nameText->layer())
+                        .arg(sym->name()));
             m_results.append(res);
         } else {
             CheckSymbolNamesAndValuesResult *res = new CheckSymbolNamesAndValuesResult(
                         sym,
                         CheckSymbolNamesAndValuesResult::Name);
+            res->setShortDescription(
+                        QObject::tr("Missing >NAME in the %1 symbol")
+                        .arg(sym->name()));
+            res->setLongDescription(
+                        QObject::tr("The %1 symbol does not have a >NAME text label on the tNames layer")
+                        .arg(sym->name()));
             m_results.append(res);
         }
     }
 
     if (m_checkNames && !hasValue) {
-        if (nameText) {
-            CheckSymbolNamesAndValuesResult *res = new CheckSymbolNamesAndValuesResult(sym,
-                                                                                       CheckSymbolNamesAndValuesResult::Value,
-                                                                                       valueText);
+        if (valueText) {
+            CheckSymbolNamesAndValuesResult *res = new CheckSymbolNamesAndValuesResult(
+                        sym,
+                        CheckSymbolNamesAndValuesResult::Value,
+                        valueText);
             res->setShortDescription(
                         QObject::tr(">VALUE label is on wrong layer in the %1 symbol")
                         .arg(sym->name()));
@@ -64,8 +78,9 @@ bool CheckSymbolNamesAndValues::checkSymbol(Symbol *sym)
                         .arg(sym->name()));
             m_results.append(res);
         } else {
-            CheckSymbolNamesAndValuesResult *res = new CheckSymbolNamesAndValuesResult(sym,
-                                                                                       CheckSymbolNamesAndValuesResult::Value);
+            CheckSymbolNamesAndValuesResult *res = new CheckSymbolNamesAndValuesResult(
+                        sym,
+                        CheckSymbolNamesAndValuesResult::Value);
             res->setShortDescription(
                         QObject::tr("Missing >VALUE in the %1 symbol")
                         .arg(sym->name()));
@@ -111,10 +126,10 @@ void CheckSymbolNamesAndValuesResult::fix()
         return;
     switch (m_type) {
     case CheckSymbolNamesAndValuesResult::Name:
-        m_text->setLayer(95); // FIXME hardcoded Names layer
+        m_text->setLayer(EagleLayers::Names);
         break;
     case CheckSymbolNamesAndValuesResult::Value:
-        m_text->setLayer(96); // FIXME hardcoded Values layer
+        m_text->setLayer(EagleLayers::Values);
         break;
     }
 }

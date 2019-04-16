@@ -14,16 +14,15 @@ bool CheckPackageNamesAndValues::checkPackage(Package *pkg)
     Text *nameText = nullptr;
     Text *valueText = nullptr;
     for (Text *text : *pkg->textList()) {
-        // FIXME hardcoded names layer
         if (m_checkNames && text->value() == ">NAME") {
-            if (text->layer() == 95)
+            if (text->layer() == EagleLayers::Names)
                 hasName = true;
             else
                 nameText = text;
         }
 
         if (m_checkValues && text->value() == ">VALUE") {
-            if (text->layer() == 96)
+            if (text->layer() == EagleLayers::Values)
                 hasValue = true;
             else
                 valueText = text;
@@ -100,10 +99,10 @@ void CheckPackageNamesAndValuesResult::fix()
         return;
     switch (m_type) {
     case Name:
-        m_text->setLayer(25); // FIXME hardcoded tNames layer
+        m_text->setLayer(EagleLayers::tNames);
         break;
     case Value:
-        m_text->setLayer(27); // FIXME hardcoded tValues layer
+        m_text->setLayer(EagleLayers::tValues);
         break;
     }
 }

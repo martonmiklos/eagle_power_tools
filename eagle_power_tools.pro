@@ -76,7 +76,8 @@ SOURCES += \
     lasercut/wizardpages/lasercutintropage.cpp \
     lasercut/wizardpages/lasercutoutputpage.cpp \
     lasercut/wizardpages/lasercutinputpage.cpp \
-    lasercut/wizardpages/lasercutfinishpage.cpp
+    lasercut/wizardpages/lasercutfinishpage.cpp \
+    library_qa/checks/icprefixcheck.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -120,7 +121,8 @@ HEADERS += \
     lasercut/wizardpages/lasercutintropage.h \
     lasercut/wizardpages/lasercutoutputpage.h \
     lasercut/wizardpages/lasercutinputpage.h \
-    lasercut/wizardpages/lasercutfinishpage.h
+    lasercut/wizardpages/lasercutfinishpage.h \
+    library_qa/checks/icprefix.h
 
 FORMS += \
         mainwindow.ui \

@@ -3,6 +3,7 @@
 #include "checks/checkpackagenamesandvalues.h"
 #include "checks/checksymbolnamesandvalues.h"
 #include "checks/devicesetpartprefixcheck.h"
+#include "checks/icprefix.h"
 #include "checks/symbolpingridcheck.h"
 
 LibraryQAChecksRegistry *LibraryQAChecksRegistry::m_instance = nullptr;
@@ -13,6 +14,7 @@ LibraryQAChecksRegistry::LibraryQAChecksRegistry()
     m_checks << new SymbolPinGridCheck();
     m_checks << new CheckPackageNamesAndValues();
     m_checks << new DevicesetPartPrefixCheck();
+    m_checks << new ICPrefixCheck();
 
     for (LibraryQA_Check *check : m_checks) {
         if (check->target() == LibraryQA_Check::CheckTarget_Symbol)

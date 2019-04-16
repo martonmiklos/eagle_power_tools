@@ -12,6 +12,7 @@ LibraryQASelectChecks::LibraryQASelectChecks(QWidget *parent) :
     ui->treeViewChecks->setModel(m_model);
     ui->treeViewChecks->header()->setSectionResizeMode(LibraryQASelectElementsModel::ColElementName, QHeaderView::Stretch);
     ui->treeViewChecks->header()->setSectionResizeMode(LibraryQASelectElementsModel::ColChecked, QHeaderView::Interactive);
+    ui->treeViewChecks->expandAll();
 }
 
 LibraryQASelectChecks::~LibraryQASelectChecks()

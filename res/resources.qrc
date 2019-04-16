@@ -2,4 +2,8 @@
     <qresource prefix="/resources">
         <file>blank_lib.lbr</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file>appicon.png</file>
+        <file>appicon_256.png</file>
+    </qresource>
 </RCC>
