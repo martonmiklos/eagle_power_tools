@@ -23,8 +23,12 @@ private:
     LaserCutOutputPage *m_outputPage;
     LaserCutFinishPage *m_finishPage;
 
-    int m_lastPageId = -10;
-    int m_inputPageId = -10;
+    enum PageId {
+        PageId_Intro,
+        PageId_Input,
+        PageId_Output,
+        PageId_Finish
+    };
 
 private slots:
     void currentIdChangedSlot();

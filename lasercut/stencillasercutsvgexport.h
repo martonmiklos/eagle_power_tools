@@ -10,8 +10,17 @@ class StencilLaserCutSVGExport
 {
 public:
     StencilLaserCutSVGExport();
+    enum Mirror {
+        Generate_NonMirrored,
+        Generate_Mirrored
+    };
+    bool generateSVG(EagleLayers::PCBLayers layer,
+                     Mirror mirror,
+                     Schematic *sch,
+                     Board *brd,
+                     const QString& boardVariant,
+                     const QString& svgPath);
 
-    bool generateSVG(EagleLayers::PCBLayers layer, Schematic *sch, Board *brd, const QString& variant, const QString& svgPath);
 private:
     void drawPads(const EagleLayers::PCBLayers layer,
                    QPainter* painter,

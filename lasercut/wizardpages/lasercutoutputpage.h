@@ -1,6 +1,8 @@
 #ifndef LASERCUTOUTPUTPAGE_H
 #define LASERCUTOUTPUTPAGE_H
 
+#include "lasercutinputpage.h"
+
 #include <QSettings>
 #include <QWizardPage>
 
@@ -13,7 +15,9 @@ class LaserCutOutputPage : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit LaserCutOutputPage(QSettings *settings, QWidget *parent = nullptr);
+    explicit LaserCutOutputPage(LaserCutInputpage *inputPage,
+                                QSettings *settings,
+                                QWidget *parent = nullptr);
     ~LaserCutOutputPage();
 
     bool generateTop() const;
@@ -22,15 +26,16 @@ public:
     QString topPath() const;
     QString bottomPath() const;
 
-private slots:
-    void on_patheditTopStencil_pathChanged(const QString &path);
-    void on_patheditBottomStencil_pathChanged(const QString &path);
-    void on_checkBoxTopStencil_toggled(bool checked);
-    void on_checkBoxBottomStencil_toggled(bool checked);
+    void loadSettings();
+    void saveSettings();
+
+    bool mirrorTopStencil() const;
+    bool mirrorBottomStencil() const;
 
 private:
     Ui::LaserCutOutputPage *ui;
     QSettings *m_settings;
+    LaserCutInputpage *m_inputPage;
 };
 
 #endif // LASERCUTOUTPUTPAGE_H

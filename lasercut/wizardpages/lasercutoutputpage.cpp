@@ -1,23 +1,17 @@
 #include "lasercutoutputpage.h"
 #include "ui_lasercutoutputpage.h"
 
-LaserCutOutputPage::LaserCutOutputPage(QSettings *settings, QWidget *parent) :
+#include <QFileInfo>
+
+LaserCutOutputPage::LaserCutOutputPage(LaserCutInputpage *inputPage,
+                                       QSettings *settings,
+                                       QWidget *parent) :
     QWizardPage(parent),
     ui(new Ui::LaserCutOutputPage),
-    m_settings(settings)
+    m_settings(settings),
+    m_inputPage(inputPage)
 {
     ui->setupUi(this);
-
-    m_settings->beginGroup("laserCutExport");
-    ui->patheditTopStencil->setPath(
-                m_settings->value("topStencil",
-                                  QDir::homePath() + QDir::separator() + "top.svg").toString());
-    ui->patheditBottomStencil->setPath(
-                m_settings->value("bottomStencil",
-                                  QDir::homePath() + QDir::separator() + "bottom.svg").toString());
-    ui->checkBoxTopStencil->setChecked(m_settings->value("topStencilEnabled", true).toBool());
-    ui->checkBoxBottomStencil->setChecked(m_settings->value("bottomStencilEnabled", true).toBool());
-    m_settings->endGroup();
 }
 
 LaserCutOutputPage::~LaserCutOutputPage()
@@ -45,30 +39,49 @@ QString LaserCutOutputPage::bottomPath() const
     return ui->patheditBottomStencil->path();
 }
 
-void LaserCutOutputPage::on_patheditTopStencil_pathChanged(const QString &path)
+void LaserCutOutputPage::loadSettings()
 {
     m_settings->beginGroup("laserCutExport");
-    m_settings->setValue("topStencil", path);
+    ui->checkBoxTopStencil->setChecked(m_settings->value("topStencilEnabled", true).toBool());
+    ui->checkBoxBottomStencil->setChecked(m_settings->value("bottomStencilEnabled", true).toBool());
+    ui->checkBoxMirrorTop->setChecked(m_settings->value("mirrorTop", true).toBool());
+    ui->checkBoxMirrorBottom->setChecked(m_settings->value("mirrorBottom", false).toBool());
+    m_settings->endGroup();
+
+    QFileInfo fi(m_inputPage->schPath());
+    ui->patheditTopStencil->setPath(
+                m_settings->value("topStencil",
+                                  QDir::homePath()
+                                  + QDir::separator()
+                                  + fi.completeBaseName()
+                                  + "_top.svg").toString());
+    fi.setFile(m_inputPage->brdPath());
+    ui->patheditBottomStencil->setPath(
+                m_settings->value("bottomStencil",
+                                  QDir::homePath()
+                                  + QDir::separator()
+                                  + fi.completeBaseName()
+                                  + "_bottom.svg").toString());
+}
+
+void LaserCutOutputPage::saveSettings()
+{
+    m_settings->beginGroup("laserCutExport");
+    m_settings->setValue("topStencil", ui->patheditTopStencil->path());
+    m_settings->setValue("bottomStencil", ui->patheditBottomStencil->path());
+    m_settings->setValue("topStencilEnabled", ui->checkBoxTopStencil->isChecked());
+    m_settings->setValue("bottomStencilEnabled", ui->checkBoxBottomStencil->isChecked());
+    m_settings->setValue("mirrorTop", ui->checkBoxMirrorTop->isChecked());
+    m_settings->setValue("mirrorBottom", ui->checkBoxMirrorBottom->isChecked());
     m_settings->endGroup();
 }
 
-void LaserCutOutputPage::on_patheditBottomStencil_pathChanged(const QString &path)
+bool LaserCutOutputPage::mirrorTopStencil() const
 {
-    m_settings->beginGroup("laserCutExport");
-    m_settings->setValue("bottomStencil", path);
-    m_settings->endGroup();
+    return ui->checkBoxMirrorTop->isChecked();
 }
 
-void LaserCutOutputPage::on_checkBoxTopStencil_toggled(bool checked)
+bool LaserCutOutputPage::mirrorBottomStencil() const
 {
-    m_settings->beginGroup("laserCutExport");
-    m_settings->setValue("topStencilEnabled", checked);
-    m_settings->endGroup();
-}
-
-void LaserCutOutputPage::on_checkBoxBottomStencil_toggled(bool checked)
-{
-    m_settings->beginGroup("laserCutExport");
-    m_settings->setValue("bottomStencilEnabled", checked);
-    m_settings->endGroup();
+    return ui->checkBoxMirrorBottom->isChecked();
 }

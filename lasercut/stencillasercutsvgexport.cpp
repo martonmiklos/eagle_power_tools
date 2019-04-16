@@ -14,7 +14,11 @@ StencilLaserCutSVGExport::StencilLaserCutSVGExport()
 
 }
 
-bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Schematic *sch, Board *brd, const QString &selectedVariant, const QString &svgPath)
+bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer,
+                                           Mirror mirror,
+                                           Schematic *sch, Board *brd,
+                                           const QString &selectedVariant,
+                                           const QString &svgPath)
 {
     QSvgGenerator generator;
     generator.setFileName(svgPath);
@@ -29,6 +33,10 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Schemat
                       UnitUtilities::mmToU(boardRect.height())));
 
     QPainter painter(&generator);
+    if (mirror == Generate_Mirrored) {
+        painter.scale(1, -1);
+        painter.translate(0, -boardRect.height());
+    }
     painter.setBrush(QBrush(Qt::black));
     painter.setPen(QPen(Qt::black, 0));
     for (Element *element : *brd->elements()->elementList()) {
@@ -55,7 +63,7 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Schemat
                         if (pkg->name() == element->package()) {
                             EagleLayers::PCBLayers exportLayer = layer;
                             bool mirror = false;
-                            float rotation = EAGLE_Utils::rotationToDegrees(element->rot(), &mirror);
+                            qreal rotation = static_cast<qreal>(EAGLE_Utils::rotationToDegrees(element->rot(), &mirror));
                             if (mirror)
                                 exportLayer = EagleLayers::oppositeLayer(exportLayer);
                             pkgFound = true;
@@ -80,11 +88,14 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer, Schemat
             }
         }
     }
+
     return true;
 }
 
 
-void StencilLaserCutSVGExport::drawPads(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+void StencilLaserCutSVGExport::drawPads(const EagleLayers::PCBLayers layer,
+                                        QPainter *painter,
+                                        Package *package)
 {
     EagleLayers::PCBLayers activeLayer = layer == EagleLayers::tCream ? EagleLayers::Top : EagleLayers::Bottom;
     EagleLayers::PCBLayers oppositeLayer = EagleLayers::oppositeLayer(activeLayer);
@@ -96,7 +107,9 @@ void StencilLaserCutSVGExport::drawPads(const EagleLayers::PCBLayers layer, QPai
     }
 }
 
-void StencilLaserCutSVGExport::drawPolygons(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+void StencilLaserCutSVGExport::drawPolygons(const EagleLayers::PCBLayers layer,
+                                            QPainter *painter,
+                                            Package *package)
 {
     for (Polygon *polygon : *package->polygonList()) {
         if (polygon->layer() == layer) {
@@ -118,7 +131,9 @@ void StencilLaserCutSVGExport::drawPolygons(const EagleLayers::PCBLayers layer, 
     }
 }
 
-void StencilLaserCutSVGExport::drawRects(const EagleLayers::PCBLayers layer, QPainter *painter, Package *package)
+void StencilLaserCutSVGExport::drawRects(const EagleLayers::PCBLayers layer,
+                                         QPainter *painter,
+                                         Package *package)
 {
     for (Rectangle *rect : *package->rectangleList()) {
         if (rect->layer() == layer) {

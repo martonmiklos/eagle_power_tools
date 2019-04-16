@@ -30,6 +30,16 @@ QString LaserCutInputpage::selectedVariant() const
     return ui->comboBoxBoardVariant->currentText();
 }
 
+QString LaserCutInputpage::schPath() const
+{
+    return ui->patheditSchematicFile->path();
+}
+
+QString LaserCutInputpage::brdPath() const
+{
+    return ui->patheditBrdFile->path();
+}
+
 void LaserCutInputpage::on_patheditBrdFile_pathChanged(const QString &path)
 {
     m_settings->beginGroup("laserCutExport");
@@ -90,3 +100,4 @@ Eagle *LaserCutInputpage::sch() const
 {
     return m_sch;
 }
+

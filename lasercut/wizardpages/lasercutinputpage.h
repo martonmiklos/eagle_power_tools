@@ -21,6 +21,8 @@ public:
     void loadSettings();
 
     QString selectedVariant() const;
+    QString schPath() const;
+    QString brdPath() const;
     Eagle *brd() const;
     Eagle *sch() const;
 
@@ -29,7 +31,6 @@ private slots:
     void on_patheditSchematicFile_pathChanged(const QString &path);
 
 private:
-
     Ui::LaserCutInputpage *ui;
     QSettings *m_settings;
     Eagle *m_brd = nullptr;
