@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "eagle_librarysaver.h"
 #include "gerberimportfixer.h"
 #include "graphicsutilities.h"
 #include "kicad/kicadlegacyfootprintimport.h"
@@ -8,6 +9,7 @@
 #include "qt_eagle_xml_parser/utils.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     MainWindowWithRecentList(parent),
@@ -109,15 +111,40 @@ void MainWindow::on_actionGerber_import_fix_triggered()
 
 void MainWindow::on_actionConvert_Kicad_library_triggered()
 {
-    QString lastKicadLibFile = QFileDialog::getOpenFileName(this,
-                                                            tr("Select Kicad library"),
-                                                            m_settings.value("lastKicadLibFile", QDir::homePath()).toString(),
+    m_settings.beginGroup("kicadconversion");
+    QString kicadLibPath = QFileDialog::getOpenFileName(this,
+                                                            tr("Select Kicad library to convert"),
+                                                            m_settings.value("lastKicadLibConvertInputFile",
+                                                                             QDir::homePath()).toString(),
                                                             tr("Kicad library files (*.mod)"));
-    if (!lastKicadLibFile.isEmpty()) {
-        KicadLegacyFootprintLibImporter importer;
-        importer.parseModFile("/tmp/AA01B-S040VA1.mod");
-        m_settings.setValue("lastKicadLibFile", lastKicadLibFile);
+    if (!kicadLibPath.isEmpty()) {
+        QFileInfo fiInput(kicadLibPath);
+        QString outPath = QFileDialog::getSaveFileName(
+                    this,
+                    tr("Save to EAGLE lbr"),
+                    m_settings.value("lastKicadLibConvertOutdir", QDir::homePath()).toString() +
+                    QDir::separator() +
+                    fiInput.completeBaseName() + QStringLiteral(".lbr"),
+                    tr("EAGLE library file (*.lbr)"));
+        if (!outPath.isEmpty()) {
+            KicadLegacyFootprintLibImporter importer;
+            Library *lib = importer.parseModFile(kicadLibPath);
+            if (EAGLE_LibrarySaver::saveLibrary(lib, outPath)) {
+                QFileInfo fi(outPath);
+                m_settings.setValue("lastKicadLibConvertOutdir", fi.path());
+                m_settings.setValue("lastKicadLibConvertInputFile", kicadLibPath);
+
+                QMessageBox::information(this,
+                                         tr("Success"),
+                                         tr("Library converted successfully!"));
+            } else {
+                QMessageBox::warning(this,
+                                         tr("Error"),
+                                         tr("Unable to convert the library!"));
+            }
+        }
     }
+    m_settings.endGroup();
 }
 
 void MainWindow::on_actionImport_Accel_ascii_triggered()
