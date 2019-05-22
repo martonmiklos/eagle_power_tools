@@ -73,6 +73,7 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer,
                             drawPads(exportLayer, &painter, pkg);
                             drawPolygons(exportLayer, &painter, pkg);
                             drawRects(exportLayer, &painter, pkg);
+                            // FIXME check circles, wires, in the lib too
 
                             painter.rotate(-rotation);
                             painter.translate(-element->x(), -element->y());
@@ -88,6 +89,37 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer,
             }
         }
     }
+
+    for (Rectangle *rect : *brd->plain()->rectangleList()) {
+        EagleLayers::PCBLayers exportLayer = layer;
+        bool mirror = false;
+        if (mirror)
+            exportLayer = EagleLayers::oppositeLayer(exportLayer);
+        if (rect->layer() == layer) {
+            painter.drawRect(QRectF(rect->x1(),
+                                      rect->y1(),
+                                      rect->x2() - rect->x1(),
+                                      rect->y2() - rect->y1()));
+        }
+    }
+
+    for (Circle *circle : *brd->plain()->circleList()) {
+        if (circle->layer() == layer) {
+            painter.drawEllipse(circle->x(), circle->y(), circle->width(), circle->width());
+        }
+    }
+
+    QPen oldPen = painter.pen();
+    for (Wire *wire : *brd->plain()->wireList()) {
+        if (wire->layer() == layer) {
+            QPen pen = painter.pen();
+            pen.setWidth(wire->width());
+            pen.setCapStyle(EAGLE_Utils::wireCapStyleToPenCapStyle(wire->cap()));
+            painter.setPen(pen);
+            painter.drawLine(wire->x1(), wire->y1(), wire->x2(), wire->y2());
+        }
+    }
+    painter.setPen(oldPen);
 
     return true;
 }
