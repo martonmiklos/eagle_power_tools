@@ -105,7 +105,7 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer,
 
     for (Circle *circle : *brd->plain()->circleList()) {
         if (circle->layer() == layer) {
-            painter.drawEllipse(circle->x(), circle->y(), circle->width(), circle->width());
+            painter.drawEllipse(QRectF(circle->x(), circle->y(), circle->width(), circle->width()));
         }
     }
 
@@ -113,10 +113,10 @@ bool StencilLaserCutSVGExport::generateSVG(EagleLayers::PCBLayers layer,
     for (Wire *wire : *brd->plain()->wireList()) {
         if (wire->layer() == layer) {
             QPen pen = painter.pen();
-            pen.setWidth(wire->width());
+            pen.setWidthF(wire->width());
             pen.setCapStyle(EAGLE_Utils::wireCapStyleToPenCapStyle(wire->cap()));
             painter.setPen(pen);
-            painter.drawLine(wire->x1(), wire->y1(), wire->x2(), wire->y2());
+            painter.drawLine(QLineF(wire->x1(), wire->y1(), wire->x2(), wire->y2()));
         }
     }
     painter.setPen(oldPen);
