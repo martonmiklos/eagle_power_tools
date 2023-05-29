@@ -1,3 +1,7 @@
+# Obsolete repo!!!
+
+I stopped using EAGLE, went on Kicad, this project will no longer going to be finished.
+
 # EPT - EAGLE Power Tools
 
 _The code is heavily WIP considered broken, nonfunctional any time_
